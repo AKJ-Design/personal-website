@@ -21,11 +21,13 @@ import Strip from '../components/Strip.astro';
 import Card from '../components/Card.astro';
 import PostCard from '../components/PostCard.astro';
 import { PROJECTS } from '../data/projects';
-import { POSTS } from '../data/posts';
+import { publishedPosts, postMeta } from '../lib/posts';
 
-/* Counts are rendered, not typed, so the labels cannot drift from the arrays.
+/* Counts are rendered, not typed, so the labels cannot drift from the source.
    decisions.md: "plate values are claims — every one must be literally true."
-   POSTS lives in data/posts.ts because /about's plate counts the same array. */
+   Posts come from the blog collection via lib/posts.ts — the same source
+   /blog/, /about's plate, RSS and the OG routes read. */
+const POSTS = (await publishedPosts()).map(postMeta);
 const projectCount = String(PROJECTS.length).padStart(2, '0');
 const postCount = String(POSTS.length).padStart(2, '0');
 ---

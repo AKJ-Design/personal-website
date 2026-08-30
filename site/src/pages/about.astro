@@ -18,10 +18,11 @@ import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import photo from '../assets/alex-480.jpg';
 import { PROJECTS } from '../data/projects';
-import { POSTS } from '../data/posts';
+import { publishedPosts } from '../lib/posts';
 import { GITHUB_URL, LINKEDIN_URL, REPO_URL } from '../data/social';
 
-const shipped = `${PROJECTS.length} projects · ${POSTS.length} ${POSTS.length === 1 ? 'post' : 'posts'}`;
+const postCount = (await publishedPosts()).length;
+const shipped = `${PROJECTS.length} projects · ${postCount} ${postCount === 1 ? 'post' : 'posts'}`;
 
 /* Receipts — every link must resolve in the public repo. "research" is not
    among them: research notes stay private, so the colophon doesn't claim them. */

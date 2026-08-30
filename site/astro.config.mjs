@@ -1,10 +1,18 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://alexyoung.com.au',
+
+  /* Sitemap (build plan §2.5). URLs resolve against `site`, so it lists the
+     canonical domain even when built for the workers.dev preview. robots.txt
+     stays Disallow-all until step 8/9 — the sitemap exists, nothing links it
+     until then. */
+  integrations: [sitemap()],
+
 
   /* imageService: 'compile' — every image on this site is a local file known at
      build time (the photo, the six card visuals, the post screenshots), so they

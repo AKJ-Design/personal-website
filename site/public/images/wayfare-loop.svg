@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 190" width="660" height="190" role="img" aria-label="The loop: Claude in chat, the MCP server, the Workers and D1 backend, and the itinerary app, connected in both directions"><!-- drawn in-system: same palette and idiom as the project-card diagrams -->
+  <!-- Claude -->
+  <rect x="12" y="28" width="136" height="64" fill="#FFFFFF" stroke="#204E39"/>
+  <text x="80" y="52" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="9" fill="#141210">Claude</text>
+  <text x="80" y="72" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="7.5" fill="#6B6358">chat · any device</text>
+  <!-- MCP server -->
+  <rect x="186" y="28" width="136" height="64" fill="#FFFFFF" stroke="#204E39"/>
+  <text x="254" y="52" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="9" fill="#141210">MCP server</text>
+  <text x="254" y="72" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="7.5" fill="#6B6358">OAuth · tools</text>
+  <!-- Workers + D1 -->
+  <rect x="360" y="28" width="136" height="64" fill="#FFFFFF" stroke="#204E39"/>
+  <text x="428" y="52" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="9" fill="#141210">Workers + D1</text>
+  <text x="428" y="72" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="7.5" fill="#6B6358">API · SQL database</text>
+  <!-- the app -->
+  <rect x="534" y="28" width="114" height="64" fill="#FFFFFF" stroke="#204E39"/>
+  <text x="591" y="52" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="9" fill="#141210">the app</text>
+  <text x="591" y="72" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="7.5" fill="#6B6358">PWA · Home Screen</text>
+  <!-- two-way links -->
+  <line x1="148" y1="60" x2="186" y2="60" stroke="#204E39"/>
+  <polyline points="154,56 148,60 154,64" fill="none" stroke="#204E39"/>
+  <polyline points="180,56 186,60 180,64" fill="none" stroke="#204E39"/>
+  <line x1="322" y1="60" x2="360" y2="60" stroke="#204E39"/>
+  <polyline points="328,56 322,60 328,64" fill="none" stroke="#204E39"/>
+  <polyline points="354,56 360,60 354,64" fill="none" stroke="#204E39"/>
+  <line x1="496" y1="60" x2="534" y2="60" stroke="#204E39"/>
+  <polyline points="502,56 496,60 502,64" fill="none" stroke="#204E39"/>
+  <polyline points="528,56 534,60 528,64" fill="none" stroke="#204E39"/>
+  <!-- the loop back: a change in chat lands in the app, and the app's edits flow back -->
+  <path d="M 591 92 L 591 130 L 80 130 L 80 98" fill="none" stroke="#204E39" stroke-dasharray="3 3"/>
+  <polyline points="76,104 80,98 84,104" fill="none" stroke="#204E39"/>
+  <text x="335" y="124" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="7" fill="#6B6358" letter-spacing="1">ALWAYS IN SYNC · A CHANGE IN CHAT IS IN THE APP SECONDS LATER</text>
+  <!-- legend -->
+  <circle cx="18" cy="166" r="3" fill="#2D6A4F"/>
+  <text x="26" y="169" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="7" fill="#6B6358" letter-spacing="1">NO MANUAL FILES · FREE TIER · OAUTH — ONLY WORKS FOR ME</text>
+</svg>

@@ -18,13 +18,17 @@ interface Props {
   title: string;
   /** Meta description. Required — build plan §2.5 wants one per page. */
   description: string;
+  /** OG card path; posts pass their own, everything else gets the site card. */
+  ogImage?: string;
+  ogType?: 'website' | 'article';
 }
 
-const { title, description } = Astro.props;
+const { title, description, ogImage = '/og/site.png', ogType = 'website' } = Astro.props;
 
 /* Canonical tags, per §2.5. Astro.site comes from astro.config.mjs, so this is
    correct on the workers.dev preview and on the custom domain without a flag. */
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
 ---
 
 <!doctype html>
@@ -37,6 +41,24 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="generator" content={Astro.generator} />
+
+    {/* OG + Twitter (build plan §2.5). Image URLs are absolute against the
+        canonical domain — scrapers don't resolve relative paths. */}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Alex Young — build log"
+      href={new URL('/rss.xml', Astro.site)}
+    />
 
     {/* Both faces preload: each is a single variable WOFF2 (22 KB / 40 KB) and
         both are used above the fold — the wordmark is display, the nav is mono.

@@ -1,0 +1,39 @@
+---
+/**
+ * WRITING INDEX — build plan step 6.
+ *
+ * No mock exists for this page by decision (README gate): it is the home
+ * page's "Writing — NN" section promoted to its own route, same section
+ * label, same PostCards, same upcoming line.
+ */
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { publishedPosts, postMeta } from '../../lib/posts';
+
+const posts = await publishedPosts();
+const postCount = String(posts.length).padStart(2, '0');
+---
+
+<Base
+  title="Writing — Alex Young"
+  description="Case studies and build-in-public posts, a couple a month at most, written when there's something worth saying."
+>
+  <section class="writing">
+    <h1 class="section-label">Writing — {postCount}</h1>
+    {posts.map((post) => <PostCard {...postMeta(post)} />)}
+    <p class="upcoming">next up — QuietNine: the launch story</p>
+  </section>
+</Base>
+
+<style>
+  .writing { padding-top: var(--space-8); }
+  .writing .upcoming {
+    margin-top: var(--space-4);
+    font-family: var(--font-mono); font-size: var(--step--1);
+    color: var(--muted-2);
+  }
+
+  @media (max-width: 720px) {
+    .writing { padding-top: var(--space-7); }
+  }
+</style>

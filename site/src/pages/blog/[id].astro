@@ -1,0 +1,190 @@
+---
+/**
+ * BLOG POST — build plan step 6.
+ *
+ * Layout from design/mocks/wayfare-part-1.html: post-head (accent eyebrow,
+ * display h1, mono meta line), flat article (scope rule 2026-08-15: hairlines
+ * on the ground, nothing floats), endplate, then the shared footer.
+ *
+ * One deliberate departure from the mock: the mock drew its own slim static
+ * header, but "sticky is a rule" (decisions.md 2026-08-23) — every page uses
+ * the shared sticky Header, so this one does too.
+ *
+ * Prompts render as <pre> with a mono label; the short opening prompt is a
+ * native <details> disclosure — zero client JS either way.
+ */
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { publishedPosts, postMeta } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await publishedPosts();
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const meta = postMeta(post);
+---
+
+<Base
+  title={`${post.data.title} · Alex Young`}
+  description={post.data.excerpt}
+  ogImage={`/og/${post.id}.png`}
+  ogType="article"
+>
+  <section class="post-head">
+    <p class="post-eyebrow">{post.data.eyebrow}</p>
+    <h1>{post.data.title}</h1>
+    {/* whitespace between expressions is compiler-trimmed, so the separators
+        are explicit strings */}
+    <p class="post-meta">{`${meta.date} · ${meta.readingTime} read · `}{post.data.tags.map((tag, i) => <span class="tag">{i > 0 ? ' ' : ''}#{tag}</span>)}</p>
+  </section>
+
+  <article class="post-body">
+    <Content />
+  </article>
+
+  <div class="endplate">
+    <a class="back" href="/">← back to the build log</a>
+    {post.data.next && <span class="next">{post.data.next}</span>}
+  </div>
+</Base>
+
+<style>
+  .post-head { padding: var(--space-7) 0 var(--space-6); }
+  /* the post eyebrow wears the accent (mock), unlike the page eyebrows */
+  .post-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--track-eyebrow);
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .post-head h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-3);
+    line-height: var(--leading-head);
+    letter-spacing: var(--track-display);
+    max-width: 26ch;
+    margin-top: var(--space-3);
+  }
+  .post-meta {
+    margin-top: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    color: var(--muted-2);
+  }
+  .post-meta .tag { color: var(--accent); }
+
+  /* ------------------------------------------------------------------ body
+     The children come from Markdown, so they need :global — every selector
+     stays anchored under .post-body. */
+  .post-body {
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-7);
+  }
+  .post-body > :global(*) { max-width: var(--measure); }
+  .post-body :global(p) { margin-bottom: var(--space-4); }
+  /* the lead is the first paragraph — styled by position, not by class, so
+     the Markdown stays plain copy */
+  .post-body > :global(p:first-of-type) { font-size: var(--step-1); color: var(--muted); }
+
+  .post-body :global(h2) {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-2);
+    line-height: var(--leading-head);
+    letter-spacing: var(--track-display);
+    margin: var(--space-7) 0 var(--space-4);
+    display: flex; align-items: baseline; gap: var(--space-3);
+  }
+  .post-body :global(h2)::before {
+    content: '//';
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  /* prompts — real, shown in full, mono on the sunk surface */
+  .post-body :global(pre) {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    line-height: 1.55;
+    background: var(--surface-sunk);
+    border: 1px solid var(--hairline-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-card);
+    padding: var(--space-4) var(--space-5);
+    margin: var(--space-5) 0;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .post-body :global(.prompt-label) {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--muted-2);
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  /* short prompts: native disclosure, no JS */
+  .post-body :global(details.prompt) { margin: var(--space-4) 0 var(--space-5); }
+  .post-body :global(details.prompt summary) {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--accent);
+    cursor: pointer;
+    width: fit-content;
+  }
+  .post-body :global(details.prompt summary:hover) { background: var(--wash); }
+  .post-body :global(details.prompt[open] summary) { margin-bottom: var(--space-2); }
+  .post-body :global(details.prompt pre) { margin: 0; }
+
+  /* screenshot placeholders — dashed until the real shot lands */
+  .post-body :global(figure.shot) {
+    background: var(--surface-sunk);
+    border: 1px dashed var(--hairline);
+    border-radius: var(--radius-card);
+    display: grid; place-items: center;
+    min-height: 260px;
+    margin: var(--space-5) 0 var(--space-6);
+    padding: var(--space-4);
+  }
+  .post-body :global(figure.shot figcaption),
+  .post-body :global(figure.diagram figcaption) {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--muted-2);
+    text-align: center;
+  }
+
+  /* in-system diagrams sit flat on the ground — no frame, caption below */
+  .post-body :global(figure.diagram) { margin: var(--space-5) 0 var(--space-6); }
+  .post-body :global(figure.diagram img) { width: 100%; height: auto; display: block; }
+  .post-body :global(figure.diagram figcaption) { margin-top: var(--space-2); }
+
+  /* ---------------------------------------------------------------- endplate */
+  .endplate {
+    border-top: 1px solid var(--hairline);
+    padding: var(--space-5) 0;
+    display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4);
+  }
+  .endplate .next, .endplate .back { font-family: var(--font-mono); font-size: var(--step--1); }
+  .endplate .next { color: var(--muted-2); }
+
+  @media (max-width: 720px) {
+    .post-head { padding: var(--space-6) 0 var(--space-5); }
+    .post-head h1 { font-size: var(--step-2); }
+    .post-body :global(figure.shot) { min-height: 180px; }
+    .endplate { flex-direction: column; }
+  }
+</style>
