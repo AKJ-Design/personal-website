@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From "find me flights" to a travel app — Part 1 · Alex Young</title>
+<style>
+/* =========================================================================
+   Step 3 mock — BLOG POST · Field Notes Light
+   Tokens inlined verbatim from design/tokens.css (self-contained mock).
+   Zero client-side JS — the prompt disclosure is a native <details>.
+   Content: Wayfare Case Study v2, Alex's draft, verbatim.
+   ========================================================================= */
+
+:root {
+  --surface:        #FAF7F2;
+  --surface-raised: #FFFFFF;
+  --surface-sunk:   #F4F0E8;
+  --ink:        #141210;
+  --muted:      #57514A;
+  --muted-2:    #6B6358;
+  --accent:       #204E39;
+  --accent-light: #2D6A4F;
+  --on-accent:    #FFFFFF;
+  --hairline:      color-mix(in srgb, var(--accent) 20%, transparent);
+  --hairline-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --wash:        color-mix(in srgb, var(--accent) 14%, transparent);
+  --wash-strong: color-mix(in srgb, var(--accent) 24%, transparent);
+  --font-display: "Space Grotesk", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-body:    system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+
+  --step--2: 0.6875rem; --step--1: 0.8125rem; --step-0: 1rem;
+  --step-1: 1.1875rem;  --step-2: 1.5rem;     --step-3: 2.125rem; --step-4: 3rem;
+  --track-eyebrow: 0.16em; --track-label: 0.10em; --track-display: -0.024em;
+  --leading-tight: 1.04; --leading-head: 1.18; --leading-body: 1.6;
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.5rem;  --space-6: 2rem;   --space-7: 3rem;    --space-8: 4rem;
+  --radius-card: 0px;
+  --measure: 65ch;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+::selection { background: var(--wash-strong); }
+
+html { background: var(--surface); }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.page { max-width: 68rem; margin: 0 auto; padding: 0 var(--space-5); }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { background: var(--wash); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ------------------------------------------------------------------ header */
+header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-1);
+  letter-spacing: var(--track-display);
+  color: var(--accent);
+  text-decoration: none;
+}
+nav { display: flex; gap: var(--space-5); }
+nav a { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink); text-decoration: none; }
+nav a:hover { background: var(--wash); color: var(--accent); }
+
+/* ------------------------------------------------------------ post header */
+.post-head { padding: var(--space-7) 0 var(--space-6); }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.post-head h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-3);
+  line-height: var(--leading-head);
+  letter-spacing: var(--track-display);
+  max-width: 26ch;
+  margin-top: var(--space-3);
+}
+.post-meta {
+  margin-top: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-2);
+}
+.post-meta .tag { color: var(--accent); }
+
+/* -------------------------------------------------------------------- body */
+article {
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-7);
+}
+article > * { max-width: var(--measure); }
+article p { margin-bottom: var(--space-4); }
+article p.lead { font-size: var(--step-1); color: var(--muted); }
+
+article h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-2);
+  line-height: var(--leading-head);
+  letter-spacing: var(--track-display);
+  margin: var(--space-7) 0 var(--space-4);
+  display: flex; align-items: baseline; gap: var(--space-3);
+}
+article h2::before {
+  content: "//";
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--accent);
+  font-weight: 400;
+}
+
+/* prompts — real, shown in full, mono on the sunk surface */
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.55;
+  background: var(--surface-sunk);
+  border: 1px solid var(--hairline-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-card);
+  padding: var(--space-4) var(--space-5);
+  margin: var(--space-5) 0;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.prompt-label {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--muted-2);
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+/* short prompts: native disclosure, no JS */
+details.prompt { margin: var(--space-4) 0 var(--space-5); }
+details.prompt summary {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--accent);
+  cursor: pointer;
+  width: fit-content;
+}
+details.prompt summary:hover { background: var(--wash); }
+details.prompt[open] summary { margin-bottom: var(--space-2); }
+details.prompt pre { margin: 0; }
+
+/* screenshot / diagram placeholders */
+figure.shot {
+  background: var(--surface-sunk);
+  border: 1px dashed var(--hairline);
+  border-radius: var(--radius-card);
+  display: grid; place-items: center;
+  min-height: 260px;
+  margin: var(--space-5) 0 var(--space-6);
+  padding: var(--space-4);
+}
+figure.shot figcaption {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--muted-2);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- end plate */
+.endplate {
+  border-top: 1px solid var(--hairline);
+  padding: var(--space-5) 0;
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4);
+}
+.endplate .next { font-family: var(--font-mono); font-size: var(--step--1); }
+.endplate .back { font-family: var(--font-mono); font-size: var(--step--1); }
+
+footer {
+  border-top: 1px solid var(--hairline);
+  padding: var(--space-5) 0 var(--space-7);
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4);
+}
+footer .links { display: flex; gap: var(--space-4); }
+footer a { font-family: var(--font-mono); font-size: var(--step--1); }
+footer .colophon { font-family: var(--font-mono); font-size: var(--step--2); color: var(--muted-2); }
+
+/* ------------------------------------------------------------------- phone */
+@media (max-width: 720px) {
+  .post-head { padding: var(--space-6) 0 var(--space-5); }
+  .post-head h1 { font-size: var(--step-2); }
+  figure.shot { min-height: 180px; }
+  nav { gap: var(--space-4); }
+  footer { flex-direction: column; }
+  .endplate { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <a class="wordmark" href="home.html">Alex Young</a>
+    <nav>
+      <a href="home.html#projects">projects</a>
+      <a href="home.html#writing">writing</a>
+      <a href="#">about</a>
+    </nav>
+  </header>
+
+  <section class="post-head">
+    <p class="eyebrow">Case study — Wayfare · Part 1 of 2</p>
+    <h1>From "find me flights" to a travel app</h1>
+    <p class="post-meta">2026-08-15 · 9 min read · <span class="tag">#ai</span> <span class="tag">#cloudflare</span> <span class="tag">#travel</span></p>
+  </section>
+
+  <article>
+    <p class="lead">The very first thing I ever asked Claude to do was find me
+    flights to Bangkok. Not "help me build an app" — just cheap flights in the
+    next two months, with my usual list of picky requirements. Some
+    back-and-forth later, I had flights that ticked every box. Boom, done.</p>
+
+    <details class="prompt">
+      <summary>tap to see the actual prompt</summary>
+      <pre>[Alex's real flight-search prompt goes here — pulled from the chat]</pre>
+    </details>
+
+    <p>Two months later, that throwaway prompt has somehow become a native iOS
+    travel app with its own database, its own API, and a live connection to
+    Claude.</p>
+
+    <p>This is Part 1 of that story: how I went from "find me things to do on
+    my trip" to an interactive visual itinerary I could use on the go — and the
+    two things it taught me about working with AI tools. First, they're very
+    good at generating options to solve a problem, but you have to be clear
+    that options are what you're asking for, or you'll get the quickest answer
+    instead. And second, the richness, depth and quality of what you get out
+    depends on, well, the richness, depth and quality of what you put in.</p>
+
+    <h2>Planning a trip in chat</h2>
+
+    <p>Next came the trip planning; I had my dates, flights and hotel sorted.
+    Now to fill in the gaps. I gave Claude the context and the ask — I was
+    planning a trip, here's what's already locked in and what I want help with
+    (<a href="#">click here for some of those prompts</a>).</p>
+
+    <p>One valuable thing I've found with Claude: it asks clarifying questions
+    rather than jumping to an answer, and the results are better for it.</p>
+
+    <p>After discussing some basics and getting settled on key topics across
+    gym, eating out, relaxation days, spas, exploring, nightlife etc., we had a
+    solid itinerary locked in, with rich detail on each activity, pricing and
+    'good to know' facts.</p>
+
+    <p>Ok, that's done right? By this stage I had used Claude to search across
+    forums, blog posts, TripAdvisor and more, across a range of trip
+    categories, and had landed on a curated and detailed itinerary… So, tick
+    that off the list?</p>
+
+    <figure class="shot"><figcaption>Screenshot — the itinerary taking shape in chat</figcaption></figure>
+
+    <p>Well in past years using AI, that is probably where I would have left
+    it. My last trip for example (four countries, five cities, a scuba diving
+    certification and a trip to the North Korean border), I transferred my plan
+    into an Excel sheet so I could keep track of everything and off I went.</p>
+
+    <p>Now have you ever tried to use an Excel sheet on your phone when on
+    holiday? Sure, it was fine for remembering which hotels I had booked and
+    what was and wasn't prepaid. But as an interactive tool mid-trip? Not a
+    chance.</p>
+
+    <h2>Ask for options, not just an answer</h2>
+
+    <p>So this time I gave Claude that challenge: Build a visual itinerary that
+    I can keep updating as I do more planning and use on the go. What are some
+    options?</p>
+
+    <p>It presented me with a few options and the readout on each: HTML
+    artifact, Excel spreadsheet, Word doc and Markdown file. Its recommendation
+    was for HTML artifact because in its words, "visually clean, can include a
+    day-tracker, color tags per category, and is easy to glance at on your
+    phone. I can keep modifying it in place as you firm up bookings (flights,
+    Muay Thai night, club nights, etc.)."</p>
+
+    <figure class="shot"><figcaption>Screenshot — options readout in chat</figcaption></figure>
+
+    <h2>iPhones hate HTML</h2>
+
+    <p>There I had it, an interactive, visually appealing, mobile friendly and
+    usable itinerary that presented as a webpage. It had colour coded
+    activities, tabs for each day, a notes section to type in booking
+    references or other info and important facts like walking distance from my
+    hotel and what to wear (some places had a dress code). But there was one
+    annoying issue: iPhones don't like HTML files. Nothing built into iOS would
+    open my itinerary — Safari on my Mac rendered it happily, Safari on my
+    iPhone wouldn't touch it. I ended up installing Microsoft Edge, one of the
+    few iPhone browsers that would open the file at all.</p>
+
+    <p>It worked, but it was clunky. Every time Claude and I updated the plan,
+    out came a fresh HTML file, and off I went to open it in Edge again. The
+    root cause: iOS won't render a bare HTML file handed to it directly — but
+    serve the exact same file over HTTPS and it's perfectly happy. In other
+    words: make my static file a website, and the problem disappears.</p>
+
+    <p>And that's what I did. I had Claude compare free hosting options — and
+    how much effort each would take to set up — and we landed on Cloudflare
+    Pages. Free, reachable from any device like any other website, and I could
+    add security (an email one-time passcode) so only I could see my
+    itinerary.</p>
+
+    <p>Now my itinerary lived at its own private URL. I even used Safari's
+    "Add to Home Screen", which made it look and behave like an app — the
+    technical name is a Progressive Web App, or PWA. One downside remained:
+    every time Claude generated an update, I had to drop the new file into
+    Cloudflare myself. A sixty-second job. Not seamless, but low effort.</p>
+
+    <figure class="shot"><figcaption>Screenshot — the PWA on the Home Screen</figcaption></figure>
+
+    <h2>An idea, a goal and a plan</h2>
+
+    <p>But I kept thinking… What if I could close this manual loop? Would it be
+    possible to use Claude to chat and plan new activities for my itinerary,
+    anywhere, anytime? Then have those changes automatically appear in my
+    itinerary? No manual files, no uploading, no friction and of course, no
+    cost.</p>
+
+    <p>Enter the world of APIs, JavaScript, SQL databases, OAuth and MCPs… Does
+    that sound foreign? Don't worry — it did to me too! But it's far more
+    approachable than you might think.</p>
+
+    <p>By this point I'd already been experimenting with Claude Code, which had
+    moved me beyond chatting into actually writing, deploying and monitoring
+    real code. I'd used it to build my first app experiment, a basic iOS Sudoku
+    game (that story's coming in another post). You can still talk to it in
+    plain natural language — what changes is what it can produce.</p>
+
+    <p>Back to my itinerary and I already had some idea that having live links
+    and data in sync would mean APIs and some sort of database, but that was
+    the extent of my knowledge. It sounded hard, but I thought honestly… I'm
+    paying for a superior AI subscription, so why not just find out what would
+    be involved, because who knows.</p>
+
+    <p>That was the challenge I gave. But here's the key — and it's back to
+    what I mentioned at the start. If you want options and not just the
+    quickest answer, say so. And be as detailed and clear about your problem
+    and your goal as you can. During one of the itinerary chat sessions, I
+    mentioned my annoyance with the static HTML files. The response?
+    Essentially, "well, stop exporting it and just view it within the chat
+    here. That way it's always live". Ok, technically true, but didn't meet my
+    actual goal. Being clear on my problems, use case and goals was what
+    unlocked an actual solution.</p>
+
+    <p>I used Claude Code to embark on this next phase. First off in Claude
+    Code I set it on 'Plan' mode. This gives it clear guidance that it isn't
+    building anything yet, it is creating a plan only:</p>
+
+    <pre><span class="prompt-label">The actual prompt</span>referencing my existing travel itinerary project we have built together, I want options to make this feel like a real production app experience. I want to be able to use Claude chat to research, get activity ideas and add them to the itinerary. Then have those changes instantly appear in the itinerary without any work from me. The goal is that I can use Claude chat on the go, from any device, to edit the itinerary. Then it just appears and I can use the itinerary web app during my travels, and it is all in sync. I want to be able to use this flow to add new trips and have those appear in the web app too. And I should be able to make notes in the web app, move activities around, and it all syncs, so next time I use Claude chat to make a change, it also knows the latest. Surface different options to facilitate this, then create a project plan for design and implementation. Clarify any unknowns before generating the plan.</pre>
+
+    <p>The solution? Since I was already hosting the static HTML on Cloudflare,
+    continuing to use Cloudflare was a sensible choice. It offered the range of
+    tools needed to facilitate this, all available on the free tier plan, since
+    this was just for me to use.</p>
+
+    <h2>Building the loop</h2>
+
+    <p>The plan was set. We would utilise Cloudflare Workers + D1, a powerful
+    combination that provides JavaScript computing and a native, lightweight
+    SQL database as the 'backend'. A secure API connection to link the database
+    information to the web app (what appears on my screen). A remote MCP
+    server, built on Cloudflare's MCP template, providing the tools for Claude
+    chat to read and edit the itinerary in real time. Proper OAuth, to ensure
+    all these connections were secret and secure, only working for me and the
+    tools I specifically granted access for.</p>
+
+    <figure class="shot"><figcaption>Diagram — the loop: Claude ↔ MCP ↔ Workers + D1 ↔ the app</figcaption></figure>
+
+    <p>I also wanted to make the design my own, changing the look, feel and
+    usability of some elements, adding elements such as map pins for Google
+    Maps links on the activities and a live trip countdown on the Home Screen.
+    I utilised Claude Design to mockup the key screens.</p>
+
+    <p>Claude Code built a detailed project build and implementation plan and
+    we got to work. This wasn't just a set and forget activity though.
+    Particularly because it involved secret API keys and a passphrase for the
+    MCP server, some actions had to be done by me. Take note of this if you
+    ever embark on something similar — always be in the driving seat for any
+    logins, account creation, passwords, secret keys etc. AI chat models will
+    generally enforce that you do those actions, but all of those secrets
+    should stay out of any chat and only ever be touched by you, otherwise you
+    put your security at risk.</p>
+
+    <p>During the build, Claude Code was also good at catching errors. It would
+    test what it had just built or deployed, and if it didn't work it would
+    stop and triage, rather than waiting until the end and finding out that
+    something from an earlier phase was broken.</p>
+
+    <h2>It works!</h2>
+
+    <p>There I had it… my own interactive travel itinerary app, sitting as an
+    'app' (web app) on my Home Screen. Designed with exactly the functionality
+    I wanted to use.</p>
+
+    <p>If I had a new idea — say, a walking food tour for day 3 of my trip — I
+    could be anywhere and use Claude chat to research options. It would scan
+    TripAdvisor reviews, read blog posts and search Google to present a few
+    ideas, with details like how far it was from the hotel and the price.
+    I'd decide or amend and then it would
+    automatically add it to my itinerary. And it was there, seconds later, in
+    my itinerary app, with no further effort from me. It was simple, fun and
+    legitimately useful — both while planning and mid-trip.</p>
+
+    <figure class="shot"><figcaption>Screenshot — the finished itinerary app</figcaption></figure>
+
+    <p>But then I started to think, what if I made this into a native iOS app?
+    Could I then build custom widgets and use Live Activities? All
+    from this little idea of an interactive itinerary…? Well the answer is yes,
+    and the easier half of the story when you have a clear goal.</p>
+
+    <p>And that is Part 2, how I went from planning a trip to building a native
+    iOS travel app called 'Wayfare'.</p>
+  </article>
+
+  <div class="endplate">
+    <a class="back" href="home.html">← back to the build log</a>
+    <span class="next">Part 2 — chat to native iOS app · coming soon</span>
+  </div>
+
+  <footer>
+    <div class="links">
+      <a href="mailto:hello@alexyoung.com.au">email</a>
+      <a href="#">github</a>
+      <a href="#">linkedin</a>
+    </div>
+    <span class="colophon">built by hand, no template · © 2026 Alex Young</span>
+  </footer>
+
+</div>
+</body>
+</html>

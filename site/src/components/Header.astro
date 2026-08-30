@@ -1,0 +1,86 @@
+---
+/**
+ * Header — sticky, blurred, one slim row at phone width.
+ * Transcribed from design/mocks/home.html rev 4 (.site-head / .head-row /
+ * .brand / .avatar / .wordmark / nav), which Alex approved at 1280 and 375.
+ *
+ * "Sticky is a rule" (decisions.md, 2026-08-23): the header row stays sticky on
+ * every page, so this component is used by every layout without exception.
+ */
+import { Image } from 'astro:assets';
+import avatar from '../assets/alex-160.jpg';
+
+/* Anchors are absolute, not bare fragments: the same header ships on /about and
+   /blog, where "#projects" would resolve to nothing. */
+const NAV = [
+  { href: '/#projects', label: 'projects' },
+  { href: '/#writing', label: 'writing' },
+  { href: '/about/', label: 'about' },
+];
+
+const { pathname } = Astro.url;
+---
+
+<header class="site-head">
+  <div class="page head-row">
+    <a class="brand" href="/">
+      <Image class="avatar" src={avatar} width={32} height={32} alt="" densities={[1, 2]} />
+      <span class="wordmark">Alex Young</span>
+    </a>
+    <nav aria-label="Primary">
+      {NAV.map(({ href, label }) => (
+        <a href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-head {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--surface) 86%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .head-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: var(--space-3); padding-bottom: var(--space-3);
+  }
+  .brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; }
+  .brand:hover { background: none; }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--hairline);
+    flex-shrink: 0;
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-1);
+    letter-spacing: var(--track-display);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  nav { display: flex; gap: var(--space-5); }
+  nav a {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  nav a:hover { background: var(--wash); color: var(--accent); }
+  /* Current page wears the accent — the thread's rule, applied to navigation. */
+  nav a[aria-current='page'] { color: var(--accent); }
+
+  /* header stays one slim row: smaller wordmark + tighter nav */
+  @media (max-width: 720px) {
+    .head-row { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+    .avatar { width: 28px; height: 28px; }
+    .wordmark { font-size: var(--step-0); }
+    nav { gap: var(--space-3); }
+    nav a { font-size: 0.75rem; }
+  }
+</style>

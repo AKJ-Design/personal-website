@@ -1,0 +1,46 @@
+---
+/**
+ * Footer — transcribed from design/mocks/home.html rev 4.
+ *
+ * The profile URLs come from data/social.ts, shared with /about's Person
+ * `sameAs` so the visible links and the structured data cannot drift.
+ */
+import { GITHUB_URL, LINKEDIN_URL } from '../data/social';
+
+const SOCIAL = [
+  { href: 'mailto:hello@alexyoung.com.au', label: 'email' },
+  { href: GITHUB_URL, label: 'github' },
+  { href: LINKEDIN_URL, label: 'linkedin' },
+];
+
+/* Build-time, not a hardcoded year — otherwise the footer quietly goes stale
+   on 1 January and the site's whole argument is that its claims are true. */
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="links">
+    {SOCIAL.map(({ href, label }) => <a href={href}>{label}</a>)}
+  </div>
+  <span class="colophon">built by hand, no template · © {year} Alex Young</span>
+</footer>
+
+<style>
+  footer {
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--hairline);
+    padding: var(--space-5) 0 var(--space-7);
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: var(--space-4);
+  }
+  footer .links { display: flex; gap: var(--space-4); }
+  footer a { font-family: var(--font-mono); font-size: var(--step--1); }
+  footer .colophon {
+    font-family: var(--font-mono); font-size: var(--step--2);
+    color: var(--muted-2);
+  }
+
+  @media (max-width: 720px) {
+    footer { flex-direction: column; }
+  }
+</style>

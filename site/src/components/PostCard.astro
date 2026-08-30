@@ -1,0 +1,50 @@
+---
+/**
+ * Post card — the writing index entry. From design/mocks/home.html rev 4.
+ *
+ * Distinguished from a project card by a 3px accent left border. It floats
+ * like the project cards do, because it is an index card and that is what
+ * elevation is reserved for.
+ */
+interface Props {
+  href: string;
+  /** ISO date — rendered as-is; the mock uses 2026-08-15 form. */
+  date: string;
+  readingTime: string;
+  title: string;
+  excerpt: string;
+}
+const { href, date, readingTime, title, excerpt } = Astro.props;
+---
+
+<a class="post-card" href={href}>
+  <span class="date">{date} · {readingTime}</span>
+  <h3>{title}</h3>
+  <p>{excerpt}</p>
+</a>
+
+<style>
+  .post-card {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline-soft);
+    border-left: 3px solid var(--accent);   /* the post-card accent */
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-1);
+    padding: var(--space-5);
+    max-width: 44rem;
+    transition: box-shadow 0.15s ease;
+  }
+  .post-card:hover { background: var(--surface-raised); box-shadow: var(--shadow-2); }
+  .post-card:hover h3 { color: var(--accent); }
+  .post-card .date {
+    font-family: var(--font-mono); font-size: var(--step--1);
+    color: var(--muted-2); font-variant-numeric: tabular-nums;
+  }
+  .post-card h3 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: var(--step-1); line-height: var(--leading-head);
+    margin: var(--space-1) 0 var(--space-2);
+  }
+  .post-card p { color: var(--muted); }
+</style>

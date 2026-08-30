@@ -1,0 +1,153 @@
+---
+/**
+ * Project card — three shapes off one component, transcribed from
+ * design/mocks/home.html rev 4.
+ *
+ * Cards are the ONE place elevation is used (tokens.css: "USE SPARINGLY —
+ * index/link cards only"). They float on the warm ground; hover lifts the
+ * shadow and turns the title accent, so the interactive cue stays green. The
+ * live strip and article pages stay flat by design — if everything floats,
+ * nothing does.
+ */
+import { Image } from 'astro:assets';
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+const { idx, kind, title, blurb, hook, meta, href, visual, alt } = project;
+---
+
+<a class:list={['card', kind]} href={href}>
+  {kind === 'flagship' && (
+    <>
+      <div class="body">
+        <span class="idx">{idx}</span>
+        <h3>{title}</h3>
+        <p>{blurb}</p>
+        {hook && <p>{hook}</p>}
+        <p class="meta">{meta}</p>
+      </div>
+      {/* eager + high priority: the flagship shot is above the fold at desktop
+          and is the page's LCP candidate. Astro defaults every Image to
+          loading="lazy", which on an above-the-fold image delays the very
+          paint Lighthouse measures — and step 9 wants >= 95 on a phone
+          profile. Every other card visual below stays lazy, correctly. */}
+      <Image
+        class="shot"
+        src={visual}
+        width={240}
+        height={300}
+        alt={alt}
+        loading="eager"
+        fetchpriority="high"
+      />
+    </>
+  )}
+
+  {kind === 'mid' && (
+    <>
+      <span class="idx">{idx}</span>
+      <h3>{title}</h3>
+      <p>{blurb}</p>
+      <Image class="vis" src={visual} alt={alt} />
+      <p class="meta">{meta}</p>
+    </>
+  )}
+
+  {kind === 'compact' && (
+    <>
+      <Image class="icon" src={visual} width={56} height={56} alt={alt} />
+      <span class="idx">{idx}</span>
+      <div>
+        <h3>{title}</h3>
+        <p>{blurb}</p>
+      </div>
+      <span class="meta">{meta}</span>
+    </>
+  )}
+</a>
+
+<style>
+  .card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-1);
+    padding: var(--space-5);
+    transition: box-shadow 0.15s ease;
+  }
+  .card:hover { background: var(--surface-raised); box-shadow: var(--shadow-2); }
+  .card:hover h3 { color: var(--accent); }   /* the interactive cue stays green */
+
+  .card .idx {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--accent);
+  }
+  .card h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-1);
+    letter-spacing: var(--track-display);
+    line-height: var(--leading-head);
+    margin-top: var(--space-2);
+  }
+  .card p { color: var(--muted); margin-top: var(--space-2); }
+  .card .meta {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--muted-2);
+    margin-top: var(--space-4);
+  }
+
+  /* flagship: full width, text + tall screenshot */
+  .card.flagship { grid-column: 1 / -1; display: flex; gap: var(--space-6); }
+  .card.flagship .body { flex: 1; align-self: center; }
+  .card.flagship h3 { font-size: var(--step-2); }
+  .card.flagship .shot {
+    display: block; width: 240px; aspect-ratio: 4 / 5; flex-shrink: 0; height: auto;
+    object-fit: cover; object-position: top;
+    border: 1px solid var(--hairline-soft);
+  }
+
+  /* real visuals (2026-08-23): the slot earned 150px — 96 was too dense for a
+     labelled diagram */
+  .vis {
+    display: block; width: 100%; height: 150px; margin-top: var(--space-4);
+    object-fit: contain; background: var(--surface-sunk);
+    border: 1px solid var(--hairline-soft); padding: var(--space-2);
+  }
+
+  /* compact: full-width slim row */
+  .card.compact {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: var(--space-5);
+    padding-block: var(--space-4);
+  }
+  .card.compact .icon { width: 56px; height: 56px; flex-shrink: 0; display: block; }
+  .card.compact h3 { display: inline; margin: 0; }
+  .card.compact p { display: inline; margin: 0 0 0 var(--space-2); }
+  .card.compact .meta { margin: 0 0 0 auto; white-space: nowrap; }
+
+  @media (max-width: 720px) {
+    .card { padding: var(--space-4); }
+    .card p { margin-top: var(--space-1); }
+    .card .meta { margin-top: var(--space-3); }
+    .card.flagship { flex-direction: column; gap: var(--space-4); }
+    .card.flagship .shot { width: 100%; aspect-ratio: 2 / 1; }
+    .vis { height: 110px; margin-top: var(--space-3); }
+
+    /* compact stops being a row: the icon, then the text, then the meta —
+       stacked. Everything inside reverts from inline to block. */
+    .card.compact { display: block; padding-block: var(--space-4); }
+    .card.compact .icon { margin-bottom: var(--space-3); }
+    .card.compact h3 { display: block; }
+    .card.compact p { display: block; margin: var(--space-1) 0 0; }
+    .card.compact .meta { display: block; margin: var(--space-3) 0 0; }
+  }
+</style>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alex Young — build log</title>
+<style>
+/* =============================================================================
+   Step 3 mock — HOME · Field Notes Light · rev 4
+   Tokens inlined verbatim from design/tokens.css (self-contained mock).
+   Zero client-side JS. Live strip shows the static build-time fallback.
+
+   REV 3 (approved 2026-08-15): cards float — --surface-raised + ink-tinted
+   shadows on the warm ground; hover = shadow lift + title turns accent.
+   The strip stays flat: if everything floats, nothing does.
+
+   REV 4 (Alex's feedback):
+   - Flagship card: story hook line added.
+   - Mobile: tighter card padding, smaller visuals — multiple cards per screen.
+   - Header floats (sticky, blurred surface); single row at phone width.
+   - First "alive" element: pulsing live dot on the strip stamp. It is --ok
+     green, NOT --accent: "live" is a status, not an interactive control, and
+     the accent thread stays reserved for interaction.
+   ============================================================================= */
+
+:root {
+  --surface:        #FAF7F2;
+  --surface-raised: #FFFFFF;
+  --surface-sunk:   #F4F0E8;
+  --ink:        #141210;
+  --muted:      #57514A;
+  --muted-2:    #6B6358;
+  --accent:       #204E39;
+  --accent-light: #2D6A4F;
+  --on-accent:    #FFFFFF;
+  --hairline:      color-mix(in srgb, var(--accent) 20%, transparent);
+  --hairline-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --wash:        color-mix(in srgb, var(--accent) 14%, transparent);
+  --wash-strong: color-mix(in srgb, var(--accent) 24%, transparent);
+  --ok:   #2D6A4F;
+  --font-display: "Space Grotesk", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-body:    system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+
+  --step--2: 0.6875rem; --step--1: 0.8125rem; --step-0: 1rem;
+  --step-1: 1.1875rem;  --step-2: 1.5rem;     --step-3: 2.125rem; --step-4: 3rem;
+  --track-eyebrow: 0.16em; --track-label: 0.10em; --track-display: -0.024em;
+  --leading-tight: 1.04; --leading-head: 1.18; --leading-body: 1.6;
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.5rem;  --space-6: 2rem;   --space-7: 3rem;    --space-8: 4rem;
+  --radius-card: 0px;
+  --measure: 65ch;
+
+  /* Elevation — approved 2026-08-15, being promoted to tokens.css */
+  --shadow-1: 0 1px 2px rgba(20, 18, 16, 0.04), 0 4px 14px rgba(20, 18, 16, 0.06);
+  --shadow-2: 0 2px 4px rgba(20, 18, 16, 0.05), 0 12px 32px rgba(20, 18, 16, 0.09);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+::selection { background: var(--wash-strong); }
+
+html { background: var(--surface); }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.page {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+
+/* --- the accent thread: every interactive thing wears the green --- */
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { background: var(--wash); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* --- type roles --- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.section-label {
+  display: flex; align-items: center; gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--muted-2);
+  margin-bottom: var(--space-5);
+}
+.section-label::before { content: "+"; color: var(--muted-2); font-weight: 400; }
+.section-label::after { content: ""; flex: 1; border-top: 1px solid var(--hairline-soft); }
+
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------- header (sticky, full-bleed) */
+.site-head {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hairline);
+}
+.head-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: var(--space-3); padding-bottom: var(--space-3);
+}
+.brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; }
+.brand:hover { background: none; }
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--hairline);
+  flex-shrink: 0;
+}
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-1);
+  letter-spacing: var(--track-display);
+  color: var(--accent);
+  white-space: nowrap;
+}
+nav { display: flex; gap: var(--space-5); }
+nav a {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--ink);
+  text-decoration: none;
+}
+nav a:hover { background: var(--wash); color: var(--accent); }
+
+/* -------------------------------------------------------------------- hero */
+.hero { padding: var(--space-8) 0 var(--space-7); }
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-4);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  max-width: 22ch;
+}
+.hero h1 em {
+  font-style: normal; /* Space Grotesk has no italic — emphasis is the accent */
+  color: var(--accent);
+}
+.hero .lead {
+  margin-top: var(--space-5);
+  font-size: var(--step-1);
+  color: var(--muted);
+  max-width: var(--measure);
+}
+
+/* -------------------------------------------------- the live status strip
+   Deliberately NOT a floating card: the strip is the signature schematic
+   element and keeps the flat survey-sheet treatment. */
+.strip {
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) auto;
+  align-items: center;
+}
+.strip .cell {
+  padding: var(--space-3) var(--space-4);
+  border-left: 1px solid var(--hairline-soft);
+}
+.strip .cell:first-child { border-left: none; padding-left: 0; }
+.strip .key {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.strip .val {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.strip .stamp {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  color: var(--muted-2);
+  text-align: right;
+  padding-left: var(--space-4);
+  white-space: nowrap;
+}
+
+/* the one moving thing on the page. --ok, not --accent: "live" is a status. */
+.live-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ok);
+  margin-right: var(--space-2);
+  vertical-align: 1px;
+  animation: pulse 2.4s ease-out infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 45%, transparent); }
+  70%  { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+}
+
+/* ------------------------------------------------------- projects (mosaic) */
+.projects { margin-top: var(--space-8); }
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline-soft);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+  transition: box-shadow 0.15s ease;
+}
+.card:hover { background: var(--surface-raised); box-shadow: var(--shadow-2); }
+.card:hover h3 { color: var(--accent); }   /* the interactive cue stays green */
+
+.card .idx {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--accent);
+}
+.card h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-1);
+  letter-spacing: var(--track-display);
+  line-height: var(--leading-head);
+  margin-top: var(--space-2);
+}
+.card p { color: var(--muted); margin-top: var(--space-2); }
+.card .meta {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted-2);
+  margin-top: var(--space-4);
+}
+
+/* placeholder visuals — every card gets one; real assets replace these */
+.ph {
+  background: var(--surface-sunk);
+  border: 1px dashed var(--hairline);
+  border-radius: var(--radius-card);
+  display: grid; place-items: center;
+  padding: var(--space-3);
+}
+.ph span {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--muted-2);
+  text-align: center;
+}
+
+/* flagship: full width, text + tall screenshot */
+.card.flagship { grid-column: 1 / -1; display: flex; gap: var(--space-6); }
+.card.flagship .body { flex: 1; align-self: center; }
+.card.flagship h3 { font-size: var(--step-2); }
+.card.flagship .ph { width: 240px; aspect-ratio: 4 / 5; flex-shrink: 0; }
+.card.flagship .shot {
+  display: block; width: 240px; aspect-ratio: 4 / 5; flex-shrink: 0; height: auto;
+  object-fit: cover; object-position: top;
+  border: 1px solid var(--hairline-soft);
+}
+
+/* real visuals (2026-08-23): same slot, no dashed placeholder */
+.vis {
+  display: block; width: 100%; height: 150px; margin-top: var(--space-4);
+  object-fit: contain; background: var(--surface-sunk);
+  border: 1px solid var(--hairline-soft); padding: var(--space-2);
+}
+.card.compact .icon { width: 56px; height: 56px; flex-shrink: 0; display: block; }
+
+/* mid cards: text with a small visual slot */
+.card.mid .ph { height: 96px; margin-top: var(--space-4); }
+
+/* compact: full-width slim row */
+.card.compact { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--space-5); padding-block: var(--space-4); }
+.card.compact .ph { width: 56px; height: 56px; flex-shrink: 0; }
+.card.compact h3 { display: inline; margin: 0; }
+.card.compact p { display: inline; margin: 0 0 0 var(--space-2); }
+.card.compact .meta { margin: 0 0 0 auto; white-space: nowrap; }
+
+/* ----------------------------------------------------------------- writing */
+.writing { margin-top: var(--space-8); }
+.post-card {
+  display: block; text-decoration: none; color: inherit;
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline-soft);
+  border-left: 3px solid var(--accent);   /* the post-card accent */
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+  max-width: 44rem;
+  transition: box-shadow 0.15s ease;
+}
+.post-card:hover { background: var(--surface-raised); box-shadow: var(--shadow-2); }
+.post-card:hover h3 { color: var(--accent); }
+.post-card .date {
+  font-family: var(--font-mono); font-size: var(--step--1);
+  color: var(--muted-2); font-variant-numeric: tabular-nums;
+}
+.post-card h3 {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: var(--step-1); line-height: var(--leading-head);
+  margin: var(--space-1) 0 var(--space-2);
+}
+.post-card p { color: var(--muted); }
+.writing .upcoming {
+  margin-top: var(--space-4);
+  font-family: var(--font-mono); font-size: var(--step--1);
+  color: var(--muted-2);
+}
+
+/* ------------------------------------------------------------------ footer */
+footer {
+  margin-top: var(--space-8);
+  border-top: 1px solid var(--hairline);
+  padding: var(--space-5) 0 var(--space-7);
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: var(--space-4);
+}
+footer .links { display: flex; gap: var(--space-4); }
+footer a { font-family: var(--font-mono); font-size: var(--step--1); }
+footer .colophon {
+  font-family: var(--font-mono); font-size: var(--step--2);
+  color: var(--muted-2);
+}
+
+/* ------------------------------------------------------------------- phone */
+@media (max-width: 720px) {
+  .hero { padding: var(--space-7) 0 var(--space-6); }
+  .hero h1 { font-size: var(--step-3); }
+  .strip { grid-template-columns: 1fr 1fr; }
+  .strip .cell { border-left: none; border-top: 1px solid var(--hairline-soft); padding-left: 0; }
+  .strip .cell:nth-child(-n+2) { border-top: none; }
+  .strip .stamp { grid-column: 1 / -1; text-align: left; padding: 0 0 var(--space-2); }
+
+  /* header stays one slim row: smaller wordmark + tighter nav */
+  .head-row { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+  .avatar { width: 28px; height: 28px; }
+  .wordmark { font-size: var(--step-0); }
+  nav { gap: var(--space-3); }
+  nav a { font-size: 0.75rem; }
+
+  /* tighter cards: more of the mosaic per screen */
+  .projects-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+  .card { padding: var(--space-4); }
+  .card p { margin-top: var(--space-1); }
+  .card .meta { margin-top: var(--space-3); }
+  .card.flagship { flex-direction: column; gap: var(--space-4); }
+  .card.flagship .ph { width: 100%; aspect-ratio: 2 / 1; }
+  .card.flagship .shot { width: 100%; aspect-ratio: 2 / 1; }
+  .card.mid .ph { height: 64px; margin-top: var(--space-3); }
+  .vis { height: 110px; margin-top: var(--space-3); }
+  .card.compact .icon { margin-bottom: var(--space-3); }
+  .card.compact { display: block; padding-block: var(--space-4); }
+  .card.compact .ph { width: 56px; height: 56px; margin-bottom: var(--space-3); }
+  .card.compact h3 { display: block; }
+  .card.compact p { display: block; margin: var(--space-1) 0 0; }
+  .card.compact .meta { display: block; margin: var(--space-3) 0 0; }
+
+  footer { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+  <header class="site-head">
+    <div class="page head-row">
+      <a class="brand" href="home.html">
+        <img class="avatar" src="../photo/alex-160.jpg" width="32" height="32" alt="">
+        <span class="wordmark">Alex Young</span>
+      </a>
+      <nav>
+        <a href="#projects">projects</a>
+        <a href="#writing">writing</a>
+        <a href="#">about</a>
+      </nav>
+    </div>
+  </header>
+
+<div class="page">
+
+  <section class="hero">
+    <p class="eyebrow">Field notes · est. 2026 · Brisbane, AU</p>
+    <h1>I run my life on <em>my own APIs</em>.</h1>
+    <p class="lead">
+      A travel app I built and shipped, a knowledge base my AI tools read and
+      write, a fitness pipeline I actually review every week. This site is the
+      portfolio and the build log behind it: what I made, the decisions and
+      trade-offs, and what I'd do differently.
+    </p>
+  </section>
+
+  <!-- Signature element: the live strip. Static build-time fallback values. -->
+  <section class="strip" aria-label="Live status">
+    <div class="cell"><span class="key">Sleep</span><span class="val">7 h 42 m</span></div>
+    <div class="cell"><span class="key">Last workout</span><span class="val">Pull · yesterday</span></div>
+    <div class="cell"><span class="key">Services</span><span class="val">11 / 11 up</span></div>
+    <div class="cell"><span class="key">Weather</span><span class="val">14 °C · clear</span></div>
+    <div class="stamp"><span class="live-dot"></span>live from my own APIs · cached 07:00</div>
+  </section>
+
+  <section class="projects" id="projects">
+    <div class="section-label">Projects — 06</div>
+
+    <div class="projects-grid">
+
+      <a class="card flagship" href="wayfare-part-1.html">
+        <div class="body">
+          <span class="idx">01</span>
+          <h3>Wayfare</h3>
+          <p>A native iOS/SwiftUI travel planner, built on my own Cloudflare
+             Workers&nbsp;+&nbsp;D1 API.</p>
+          <p>+ the story of a flight search becoming a fully fledged iOS app</p>
+          <p class="meta">SwiftUI · Cloudflare · MCP · shipped</p>
+        </div>
+        <img class="shot" src="assets/wayfare-today.jpg" width="240" height="300" alt="Wayfare — a Bangkok trip: stays, flights and the day-one itinerary">
+      </a>
+
+      <a class="card mid" href="#">
+        <span class="idx">02</span>
+        <h3>The brain</h3>
+        <p>A plain-markdown knowledge base with an MCP server on top, so my
+           AI tools and I read the same source of truth.</p>
+        <img class="vis" src="assets/brain.svg" alt="Diagram: AI tools read and write the brain, which I also read and write">
+        <p class="meta">markdown · MCP · 11 docs</p>
+      </a>
+
+      <a class="card mid" href="#">
+        <span class="idx">03</span>
+        <h3>Fitness dashboard</h3>
+        <p>A local-first pipeline pulling training, sleep and nutrition into
+           one SQLite hub, reviewed weekly through MCP.</p>
+        <img class="vis" src="assets/fitness.svg" alt="Bar chart: weekly training tonnage over twelve weeks">
+        <p class="meta">SQLite · local-first</p>
+      </a>
+
+      <a class="card compact" href="#">
+        <img class="icon" src="assets/quietnine-icon.png" width="56" height="56" alt="">
+        <span class="idx">04</span>
+        <div>
+          <h3>QuietNine</h3>
+          <p>A minimalist SwiftUI Sudoku, built end-to-end to learn the
+             platform properly.</p>
+        </div>
+        <span class="meta">SwiftUI</span>
+      </a>
+
+      <a class="card mid" href="#">
+        <span class="idx">05</span>
+        <h3>Homelab</h3>
+        <p>A two-box setup in the study: Proxmox, DNS, a reverse proxy, and
+           Prometheus/Grafana watching the lot — learned from the BIOS up.</p>
+        <img class="vis" src="assets/homelab.svg" alt="Diagram: services VM on Proxmox, node box, and off-site VPS">
+        <p class="meta">Proxmox · Caddy · Grafana · 11 services</p>
+      </a>
+
+      <a class="card mid" href="#">
+        <span class="idx">06</span>
+        <h3>This site</h3>
+        <p>Astro on Cloudflare, zero JS, a design system shared with
+           Wayfare. Built in the open; the rejected directions are in the repo.</p>
+        <img class="vis" src="assets/this-site.svg" alt="Diagram: one shared design-system spine with two themes">
+        <p class="meta">Astro · Cloudflare · zero JS</p>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="writing" id="writing">
+    <div class="section-label">Writing — 01</div>
+    <a class="post-card" href="wayfare-part-1.html">
+      <span class="date">2026-08-15 · 9 min</span>
+      <h3>From "find me flights" to a travel app — Part 1</h3>
+      <p>The very first thing I ever asked Claude to do was find me flights to
+         Bangkok. Two months later, that throwaway prompt has somehow become a
+         native iOS travel app.</p>
+    </a>
+    <p class="upcoming">next up — QuietNine: the launch story</p>
+  </section>
+
+  <footer>
+    <div class="links">
+      <a href="mailto:hello@alexyoung.com.au">email</a>
+      <a href="#">github</a>
+      <a href="#">linkedin</a>
+    </div>
+    <span class="colophon">built by hand, no template · © 2026 Alex Young</span>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+// Source config. NOTE: `wrangler deploy` does NOT use this file directly —
+// the adapter writes a resolved copy to dist/client/wrangler.json and points
+// wrangler at it via .wrangler/deploy/config.json ("redirected configuration").
+// That is why `assets.directory` below reads ./dist while the real assets are
+// in dist/client. Edit this file; never the generated one.
+//
+// `name` sets the *.workers.dev preview hostname: alexyoung-com-au.<subdomain>.workers.dev
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"compatibility_date": "2026-08-26",
+	"compatibility_flags": ["global_fetch_strictly_public"],
+	"name": "alexyoung-com-au",
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true
+	}
+}

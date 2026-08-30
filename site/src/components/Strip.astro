@@ -1,0 +1,127 @@
+---
+/**
+ * The live status strip — the signature element.
+ *
+ * STEP 4 STATE: build-time fallback values, exactly as in the mock. Nothing
+ * here is live yet.
+ *
+ * STEP 7 will feed it from Workers KV: an hourly snapshot pushed from the
+ * MacBook (never pulled — Cloudflare must not reach into the tailnet, per
+ * principles.md's perimeter rule). At that point `/` becomes the only
+ * non-prerendered route and these values become the *degrade* case:
+ *
+ *   KV fresh          → render it, with its own cached_at as the stamp
+ *   KV stale > 24 h   → render the last values, stamp says so
+ *   KV empty/missing  → render exactly what is below
+ *
+ * Never an empty row, never an error (directions.md's degrade rule). That is
+ * why the fallbacks live in the component rather than being fetched — there is
+ * always something to draw.
+ *
+ * Deliberately NOT a floating card: the strip keeps the flat survey-sheet
+ * treatment while the project cards float. If everything floats, nothing does.
+ *
+ * PRIVACY, when the real data arrives (build plan §2.3): values stay coarse
+ * (sleep to 15 min, workout day-relative), delayed, and the service count is a
+ * NUMBER, never a list — and the Prometheus query behind it must use an
+ * explicit allow-list of service names (kept in the private build plan): the
+ * published count covers the services VM only.
+ */
+
+interface Cell {
+  key: string;
+  val: string;
+}
+
+const CELLS: Cell[] = [
+  { key: 'Sleep', val: '7 h 42 m' },
+  { key: 'Last workout', val: 'Pull · yesterday' },
+  { key: 'Services', val: '11 / 11 up' },
+  { key: 'Weather', val: '14 °C · clear' },
+];
+
+const stamp = 'live from my own APIs · cached 07:00';
+---
+
+<section class="strip" aria-label="Live status">
+  {CELLS.map(({ key, val }) => (
+    <div class="cell">
+      <span class="key">{key}</span>
+      <span class="val">{val}</span>
+    </div>
+  ))}
+  <div class="stamp"><span class="live-dot"></span>{stamp}</div>
+</section>
+
+<style>
+  .strip {
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    align-items: center;
+  }
+  .strip .cell {
+    padding: var(--space-3) var(--space-4);
+    border-left: 1px solid var(--hairline-soft);
+  }
+  .strip .cell:first-child { border-left: none; padding-left: 0; }
+  .strip .key {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--track-eyebrow);
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .strip .val {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .strip .stamp {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--muted-2);
+    text-align: right;
+    padding-left: var(--space-4);
+    white-space: nowrap;
+  }
+
+  /* The one moving thing on the page. --ok, NOT --accent: "live" is a status,
+     not an interactive control, and the accent thread stays reserved for
+     interaction. */
+  .live-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ok);
+    margin-right: var(--space-2);
+    vertical-align: 1px;
+    animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 45%, transparent); }
+    70%  { box-shadow: 0 0 0 7px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot { animation: none; }
+  }
+
+  @media (max-width: 720px) {
+    .strip { grid-template-columns: 1fr 1fr; }
+    .strip .cell {
+      border-left: none;
+      border-top: 1px solid var(--hairline-soft);
+      padding-left: 0;
+    }
+    .strip .cell:nth-child(-n+2) { border-top: none; }
+    .strip .stamp {
+      grid-column: 1 / -1;
+      text-align: left;
+      padding: 0 0 var(--space-2);
+    }
+  }
+</style>

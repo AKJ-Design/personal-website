@@ -1,0 +1,675 @@
+<title>Four Greens on Off-White</title>
+<style>
+  /* ------------------------------------------------------------------
+     Deliberately single-theme. The warm off-white ground IS the variable
+     under test (directions.md, Direction B) — rendering this page dark
+     would destroy the thing it exists to measure. Every colour is
+     therefore painted explicitly, and no OS theme is consulted.
+     ------------------------------------------------------------------ */
+  :root {
+    --ground:      #FAF7F2;  /* warm off-white — the tested ground */
+    --ground-sunk: #F4F0E8;
+    --ink:         #141210;  /* 17.49:1 on ground */
+    --stone-700:   #57514A;  /* 7.33:1  — secondary prose */
+    --stone-500:   #6B6358;  /*  5.53:1 — labels & schematic marks */
+    --rule:        #DDD6CB;
+    --rule-soft:   #E8E2D8;
+
+    --g-deep:   #1B4332;
+    --g-forest: #204E39;
+    --g-slate:  #2F5D50;
+    --g-pine:   #2D6A4F;
+
+    --accent: var(--g-forest);
+    --page-accent: var(--stone-500);
+
+    --sans: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+    --step-0: 1rem;
+    --step-1: 1.1875rem;
+    --step-2: 1.5rem;
+    --step-3: 2.125rem;
+    --step-4: 3rem;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: var(--step-0);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.1rem, 4vw, 2.5rem) 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .label {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--stone-500);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .masthead-top {
+    display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem;
+    align-items: baseline; justify-content: space-between;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--page-accent);
+    transition: border-color 260ms ease;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: var(--step-4);
+    line-height: 1.04;
+    letter-spacing: -0.024em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--page-accent);
+    transition: color 260ms ease;
+  }
+
+  .standfirst {
+    max-width: 63ch;
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--stone-700);
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  .caveat {
+    max-width: 68ch;
+    margin: 0;
+    padding: 0.85rem 1rem;
+    background: var(--ground-sunk);
+    border-left: 2px solid var(--stone-500);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--stone-700);
+  }
+  .caveat strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- section furniture ---------- */
+
+  .section { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .section-head {
+    display: flex; align-items: baseline; gap: 1rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.6rem;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-size: var(--step-2);
+    letter-spacing: -0.014em;
+    font-weight: 600;
+  }
+  .section-head .label { margin-left: auto; }
+
+  /* ---------- plates ---------- */
+
+  .plates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: clamp(1.1rem, 2.2vw, 1.75rem);
+  }
+
+  .plate {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    padding: 1.5rem 1.4rem 1.4rem;
+    background: var(--ground);
+    border: 1px solid var(--rule);
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color 200ms ease, box-shadow 200ms ease, opacity 260ms ease;
+  }
+  .plate:hover { border-color: var(--accent); }
+  .plate:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* survey corner ticks */
+  .plate::before, .plate::after {
+    content: "";
+    position: absolute;
+    width: 9px; height: 9px;
+    border-color: var(--accent);
+    border-style: solid;
+    opacity: 0.55;
+    transition: opacity 200ms ease;
+  }
+  .plate::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+  .plate::after  { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+  .plate[aria-pressed="true"] {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+  .plate[aria-pressed="true"]::before,
+  .plate[aria-pressed="true"]::after { opacity: 1; }
+
+  body[data-focus] .plate[aria-pressed="false"] { opacity: 0.34; }
+
+  /* plate accents */
+  .plate.deep   { --accent: var(--g-deep); }
+  .plate.forest { --accent: var(--g-forest); }
+  .plate.slate  { --accent: var(--g-slate); }
+  .plate.pine   { --accent: var(--g-pine); }
+
+  /* plate header: hex + measured ratio */
+  .plate-id {
+    display: flex; align-items: baseline; gap: 0.6rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .chip {
+    width: 1.05rem; height: 1.05rem;
+    background: var(--accent);
+    flex: none;
+    align-self: center;
+  }
+  .plate-hex {
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  .plate-name { font-size: 0.8125rem; color: var(--stone-700); }
+  .plate-ratio {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--stone-700);
+  }
+  .plate-ratio b { color: var(--accent); font-weight: 600; }
+
+  /* --- the specimen: identical content in all four --- */
+
+  .wordmark {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em;
+  }
+  .wordmark .mark {
+    width: 0.5rem; height: 0.5rem;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .wordmark .dom { color: var(--accent); }
+
+  .spec-body { margin: 0; font-size: 0.9375rem; line-height: 1.62; color: var(--stone-700); }
+  .spec-body .lnk {
+    color: var(--accent);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    transition: background-color 160ms ease, text-decoration-color 160ms ease;
+  }
+  .plate:hover .spec-body .lnk {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    text-decoration-color: var(--accent);
+  }
+  .sel {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    padding: 0.05em 0;
+  }
+
+  /* the live status strip — Direction B's signature element */
+  .strip {
+    display: flex;
+    border-top: 1px solid var(--accent);
+    border-bottom: 1px solid var(--rule-soft);
+    overflow-x: auto;
+  }
+  .strip-cell {
+    flex: 1 0 auto;
+    padding: 0.55rem 0.7rem 0.6rem;
+    display: flex; flex-direction: column; gap: 0.15rem;
+    border-right: 1px solid var(--rule-soft);
+  }
+  .strip-cell:last-child { border-right: 0; }
+  .strip-k {
+    font-family: var(--mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .strip-v {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  /* a post card */
+  .card {
+    padding: 0.85rem 0.9rem;
+    background: var(--ground-sunk);
+    border-left: 2px solid var(--accent);
+    display: flex; flex-direction: column; gap: 0.3rem;
+  }
+  .card-k {
+    font-family: var(--mono); font-size: 0.5625rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .card-t { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; }
+  .card-m {
+    font-family: var(--mono); font-size: 0.6875rem;
+    color: var(--stone-500); font-variant-numeric: tabular-nums;
+  }
+
+  .btn-row { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+  .btn, .btn-ghost {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 0.8125rem; font-weight: 600;
+    padding: 0.5rem 0.9rem;
+    line-height: 1.2;
+  }
+  .btn {
+    background: var(--accent);
+    color: #FFFFFF;
+    border: 1px solid var(--accent);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  /* ---------- data table ---------- */
+
+  .table-scroll { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    min-width: 540px;
+  }
+  caption {
+    text-align: left;
+    padding-bottom: 0.7rem;
+    font-size: 0.8125rem;
+    color: var(--stone-700);
+  }
+  th, td {
+    text-align: left;
+    padding: 0.6rem 0.8rem 0.6rem 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--stone-500);
+    font-weight: 400;
+    border-bottom-color: var(--rule);
+  }
+  td.num {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .swatch-cell { display: flex; align-items: center; gap: 0.55rem; }
+  .swatch-cell i { width: 0.85rem; height: 0.85rem; flex: none; }
+  .grade {
+    font-family: var(--mono); font-size: 0.625rem;
+    letter-spacing: 0.1em; padding: 0.15rem 0.4rem;
+    border: 1px solid var(--rule); color: var(--stone-700);
+  }
+  .grade.aaa { border-color: var(--g-forest); color: var(--g-forest); }
+
+  /* ---------- trade-offs ---------- */
+
+  .reads { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem 2rem; }
+  .read { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.75rem; border-top: 2px solid var(--accent); }
+  .read.deep { --accent: var(--g-deep); }
+  .read.forest { --accent: var(--g-forest); }
+  .read.slate { --accent: var(--g-slate); }
+  .read.pine { --accent: var(--g-pine); }
+  .read h3 { margin: 0; font-size: 0.9375rem; font-weight: 600; font-family: var(--mono); letter-spacing: 0.01em; color: var(--accent); }
+  .read p { margin: 0; font-size: 0.875rem; line-height: 1.55; color: var(--stone-700); }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--stone-700);
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+
+  .hint {
+    font-size: 0.8125rem;
+    color: var(--stone-700);
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .dim { color: var(--stone-700); }
+  code {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    background: var(--ground-sunk);
+    padding: 0.1em 0.35em;
+  }
+  .plate:focus-visible, .plate:focus-within { outline-offset: 3px; }
+</style>
+
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <span class="label">personal-website · design · step 4</span>
+      <span class="label" id="statusline">ground #FAF7F2 · ink #141210</span>
+    </div>
+    <h1>Which green carries <em>the whole site</em>?</h1>
+    <p class="standfirst">
+      Direction B gives one colour every interactive job on the site — wordmark, link underlines
+      and marker hover, selection, card accents, and the live strip's labels. So the question isn't
+      which swatch is nicest. It's which one survives being used <em>that</em> much without going
+      loud or going grey.
+    </p>
+    <p class="caveat">
+      <strong>What's exact and what isn't.</strong> The greens, the ground, the ink and every
+      contrast figure are exact. The <strong>display and mono faces are stand-ins</strong> — Space
+      Grotesk and JetBrains Mono can't load here, so this uses your system faces at the intended
+      sizes and spacing. Body copy is already the system stack, which is what Direction B specifies.
+      Judge colour from this page, not letterforms.
+    </p>
+    <p class="hint">Click a plate to mute the other three and pull that green up into the page furniture — the closest thing to seeing it at full strength.</p>
+  </header>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Four plates, one specimen</h2>
+      <span class="label">identical content · accent varies</span>
+    </div>
+    <div class="plates" id="plates">
+    <div class="plate deep" role="button" tabindex="0" aria-pressed="false"
+         aria-label="Apply Deep forest #1B4332 to the page furniture" data-key="deep" data-hex="#1B4332">
+      <span class="plate-id">
+        <span class="chip"></span>
+        <span class="plate-hex">#1B4332</span>
+        <span class="plate-name">Deep forest</span>
+        <span class="plate-ratio"><b>10.37</b>:1</span>
+      </span>
+
+      <div class="wordmark"><span class="mark"></span>Alex Young<span class="dom">.com.au</span></div>
+
+      <p class="spec-body">I run my life on my own APIs — a travel app I
+        <span class="lnk">built and shipped</span>, a knowledge base my AI tools read and write,
+        and <span class="sel">a fitness pipeline I actually review</span> every week.</p>
+
+      <div class="strip">
+        <div class="strip-cell"><span class="strip-k">Sleep</span><span class="strip-v">7h 12m</span></div>
+        <div class="strip-cell"><span class="strip-k">Last lift</span><span class="strip-v">Pull A · 2d</span></div>
+        <div class="strip-cell"><span class="strip-k">Services</span><span class="strip-v">14/14 up</span></div>
+        <div class="strip-cell"><span class="strip-k">Local</span><span class="strip-v">13°C</span></div>
+      </div>
+
+      <div class="card">
+        <span class="card-k">Case study</span>
+        <span class="card-t">Wayfare</span>
+        <span class="card-m">SwiftUI · Workers · D1 — 2026</span>
+      </div>
+
+      <div class="btn-row">
+        <span class="btn">Read the build log</span>
+        <span class="btn-ghost">All projects</span>
+      </div>
+    </div>
+    <div class="plate forest" role="button" tabindex="0" aria-pressed="false"
+         aria-label="Apply Forest #204E39 to the page furniture" data-key="forest" data-hex="#204E39">
+      <span class="plate-id">
+        <span class="chip"></span>
+        <span class="plate-hex">#204E39</span>
+        <span class="plate-name">Forest</span>
+        <span class="plate-ratio"><b>8.89</b>:1</span>
+      </span>
+
+      <div class="wordmark"><span class="mark"></span>Alex Young<span class="dom">.com.au</span></div>
+
+      <p class="spec-body">I run my life on my own APIs — a travel app I
+        <span class="lnk">built and shipped</span>, a knowledge base my AI tools read and write,
+        and <span class="sel">a fitness pipeline I actually review</span> every week.</p>
+
+      <div class="strip">
+        <div class="strip-cell"><span class="strip-k">Sleep</span><span class="strip-v">7h 12m</span></div>
+        <div class="strip-cell"><span class="strip-k">Last lift</span><span class="strip-v">Pull A · 2d</span></div>
+        <div class="strip-cell"><span class="strip-k">Services</span><span class="strip-v">14/14 up</span></div>
+        <div class="strip-cell"><span class="strip-k">Local</span><span class="strip-v">13°C</span></div>
+      </div>
+
+      <div class="card">
+        <span class="card-k">Case study</span>
+        <span class="card-t">Wayfare</span>
+        <span class="card-m">SwiftUI · Workers · D1 — 2026</span>
+      </div>
+
+      <div class="btn-row">
+        <span class="btn">Read the build log</span>
+        <span class="btn-ghost">All projects</span>
+      </div>
+    </div>
+    <div class="plate slate" role="button" tabindex="0" aria-pressed="false"
+         aria-label="Apply Slate-forest #2F5D50 to the page furniture" data-key="slate" data-hex="#2F5D50">
+      <span class="plate-id">
+        <span class="chip"></span>
+        <span class="plate-hex">#2F5D50</span>
+        <span class="plate-name">Slate-forest</span>
+        <span class="plate-ratio"><b>7.01</b>:1</span>
+      </span>
+
+      <div class="wordmark"><span class="mark"></span>Alex Young<span class="dom">.com.au</span></div>
+
+      <p class="spec-body">I run my life on my own APIs — a travel app I
+        <span class="lnk">built and shipped</span>, a knowledge base my AI tools read and write,
+        and <span class="sel">a fitness pipeline I actually review</span> every week.</p>
+
+      <div class="strip">
+        <div class="strip-cell"><span class="strip-k">Sleep</span><span class="strip-v">7h 12m</span></div>
+        <div class="strip-cell"><span class="strip-k">Last lift</span><span class="strip-v">Pull A · 2d</span></div>
+        <div class="strip-cell"><span class="strip-k">Services</span><span class="strip-v">14/14 up</span></div>
+        <div class="strip-cell"><span class="strip-k">Local</span><span class="strip-v">13°C</span></div>
+      </div>
+
+      <div class="card">
+        <span class="card-k">Case study</span>
+        <span class="card-t">Wayfare</span>
+        <span class="card-m">SwiftUI · Workers · D1 — 2026</span>
+      </div>
+
+      <div class="btn-row">
+        <span class="btn">Read the build log</span>
+        <span class="btn-ghost">All projects</span>
+      </div>
+    </div>
+    <div class="plate pine" role="button" tabindex="0" aria-pressed="false"
+         aria-label="Apply Pine #2D6A4F to the page furniture" data-key="pine" data-hex="#2D6A4F">
+      <span class="plate-id">
+        <span class="chip"></span>
+        <span class="plate-hex">#2D6A4F</span>
+        <span class="plate-name">Pine</span>
+        <span class="plate-ratio"><b>5.98</b>:1</span>
+      </span>
+
+      <div class="wordmark"><span class="mark"></span>Alex Young<span class="dom">.com.au</span></div>
+
+      <p class="spec-body">I run my life on my own APIs — a travel app I
+        <span class="lnk">built and shipped</span>, a knowledge base my AI tools read and write,
+        and <span class="sel">a fitness pipeline I actually review</span> every week.</p>
+
+      <div class="strip">
+        <div class="strip-cell"><span class="strip-k">Sleep</span><span class="strip-v">7h 12m</span></div>
+        <div class="strip-cell"><span class="strip-k">Last lift</span><span class="strip-v">Pull A · 2d</span></div>
+        <div class="strip-cell"><span class="strip-k">Services</span><span class="strip-v">14/14 up</span></div>
+        <div class="strip-cell"><span class="strip-k">Local</span><span class="strip-v">13°C</span></div>
+      </div>
+
+      <div class="card">
+        <span class="card-k">Case study</span>
+        <span class="card-t">Wayfare</span>
+        <span class="card-m">SwiftUI · Workers · D1 — 2026</span>
+      </div>
+
+      <div class="btn-row">
+        <span class="btn">Read the build log</span>
+        <span class="btn-ghost">All projects</span>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Measured</h2>
+      <span class="label">wcag 2.1 · sRGB</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <caption>Contrast against the warm off-white ground, and for white text on a filled control. AA needs 4.5:1 for normal text; AAA needs 7:1.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Candidate</th>
+            <th scope="col">On #FAF7F2</th>
+            <th scope="col">Grade</th>
+            <th scope="col">White on it</th>
+            <th scope="col">Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="swatch-cell"><i style="background:#1B4332"></i>#1B4332 <span class="dim">Deep forest</span></span></td>
+            <td class="num">10.37:1</td><td><span class="grade aaa">AAA</span></td>
+            <td class="num">11.08:1</td><td><span class="grade aaa">AAA</span></td>
+          </tr>
+          <tr>
+            <td><span class="swatch-cell"><i style="background:#204E39"></i>#204E39 <span class="dim">Forest</span></span></td>
+            <td class="num">8.89:1</td><td><span class="grade aaa">AAA</span></td>
+            <td class="num">9.50:1</td><td><span class="grade aaa">AAA</span></td>
+          </tr>
+          <tr>
+            <td><span class="swatch-cell"><i style="background:#2F5D50"></i>#2F5D50 <span class="dim">Slate-forest</span></span></td>
+            <td class="num">7.01:1</td><td><span class="grade aaa">AAA</span></td>
+            <td class="num">7.49:1</td><td><span class="grade aaa">AAA</span></td>
+          </tr>
+          <tr>
+            <td><span class="swatch-cell"><i style="background:#2D6A4F"></i>#2D6A4F <span class="dim">Pine</span></span></td>
+            <td class="num">5.98:1</td><td><span class="grade">AA</span></td>
+            <td class="num">6.39:1</td><td><span class="grade">AA</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>What each one costs you</h2>
+      <span class="label">the honest read</span>
+    </div>
+    <div class="reads">
+      <div class="read deep">
+        <h3>#1B4332</h3>
+        <p>Safest for print and Word, where rendering shifts unpredictably, and the most contrast headroom by a distance. But at this depth it reads as near-black that happens to be green — the accent thread stops announcing itself, which is most of what you're buying.</p>
+      </div>
+      <div class="read forest">
+        <h3>#204E39</h3>
+        <p>Clears AAA both ways, so one value does links, labels, marks and filled buttons with no second "accessible variant" to maintain. Still legibly green at small mono sizes. The least interesting answer and probably the right one.</p>
+      </div>
+      <div class="read slate">
+        <h3>#2F5D50</h3>
+        <p>Cooler and greyer — calmest next to Wayfare's warm gold if you ever show both systems together, and still AAA. But it's the least forest of the four, and drifts toward "considered neutral" rather than a key colour.</p>
+      </div>
+      <div class="read pine">
+        <h3>#2D6A4F</h3>
+        <p>Unmistakably green, strongest thread presence at a glance. Costs you AAA (5.98:1) and leaves least margin on a projector or a cheap printer. Fine on the web; most likely to need a darker sibling for documents.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label">next</span>
+    <p style="margin:0">Reply with the hex you want and I'll lock it in as <code>--accent</code> for the Field Notes Light theme, then build the spec sheet, the brain doc and the Office templates on top of it.</p>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var platesEl = document.getElementById('plates');
+    var status = document.getElementById('statusline');
+    var base = 'ground #FAF7F2 · ink #141210';
+    if (!platesEl) return;
+
+    function apply(plate) {
+      var key = plate.getAttribute('data-key');
+      var already = document.body.getAttribute('data-focus') === key;
+      var all = platesEl.querySelectorAll('.plate');
+
+      for (var i = 0; i < all.length; i++) {
+        all[i].setAttribute('aria-pressed',
+          String(!already && all[i].getAttribute('data-key') === key));
+      }
+
+      if (already) {
+        document.body.removeAttribute('data-focus');
+        document.documentElement.style.setProperty('--page-accent', 'var(--stone-500)');
+        status.textContent = base;
+      } else {
+        document.body.setAttribute('data-focus', key);
+        document.documentElement.style.setProperty('--page-accent', plate.getAttribute('data-hex'));
+        status.textContent = base + ' · accent ' + plate.getAttribute('data-hex');
+      }
+    }
+
+    platesEl.addEventListener('click', function (e) {
+      var plate = e.target.closest('.plate');
+      if (plate) apply(plate);
+    });
+
+    platesEl.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var plate = e.target.closest('.plate');
+      if (!plate) return;
+      e.preventDefault();
+      apply(plate);
+    });
+  })();
+</script>

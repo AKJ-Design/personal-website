@@ -1,0 +1,6 @@
+.DS_Store
+design/photo/source/
+design/mocks/assets/wayfare-today-source.png
+
+# wrangler local state (created if wrangler is run from the repo root)
+.wrangler/

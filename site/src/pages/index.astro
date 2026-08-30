@@ -1,0 +1,104 @@
+---
+/**
+ * HOME — build plan step 4.
+ *
+ * Matches design/mocks/home.html rev 4. Copy is verbatim from
+ * ../../content/home.md, per the content-before-pixels rule ("the mocks use
+ * this copy verbatim") — if a line here and a line there ever disagree,
+ * content/home.md is right.
+ *
+ * The hero hook opens "I'm Alex," to match /about (decision 2026-08-23). The
+ * full name does the entity-consistency work in the wordmark, the <title> and
+ * the Person structured data instead.
+ *
+ * Step 7 turns this into the site's ONE non-prerendered route
+ * (`export const prerender = false`) so the strip can read KV. Everything else
+ * stays a static asset. Nothing on this page needs client JS either way — the
+ * pulsing dot is CSS.
+ */
+import Base from '../layouts/Base.astro';
+import Strip from '../components/Strip.astro';
+import Card from '../components/Card.astro';
+import PostCard from '../components/PostCard.astro';
+import { PROJECTS } from '../data/projects';
+import { POSTS } from '../data/posts';
+
+/* Counts are rendered, not typed, so the labels cannot drift from the arrays.
+   decisions.md: "plate values are claims — every one must be literally true."
+   POSTS lives in data/posts.ts because /about's plate counts the same array. */
+const projectCount = String(PROJECTS.length).padStart(2, '0');
+const postCount = String(POSTS.length).padStart(2, '0');
+---
+
+<Base
+  title="Alex Young — build log"
+  description="Portfolio and build log: a travel app I built and shipped, a knowledge base my AI tools read and write, and a fitness pipeline I review every week. What I made, the trade-offs, and what I'd do differently."
+>
+  <section class="hero">
+    <p class="eyebrow">Field notes · est. 2026 · Brisbane, AU</p>
+    <h1>I run my life on <em>my own APIs</em>.</h1>
+    <p class="lead">
+      A travel app I built and shipped, a knowledge base my AI tools read and
+      write, a fitness pipeline I actually review every week. This site is the
+      portfolio and the build log behind it: what I made, the decisions and
+      trade-offs, and what I'd do differently.
+    </p>
+  </section>
+
+  <Strip />
+
+  <section class="projects" id="projects">
+    <h2 class="section-label">Projects — {projectCount}</h2>
+    <div class="projects-grid">
+      {PROJECTS.map((project) => <Card project={project} />)}
+    </div>
+  </section>
+
+  <section class="writing" id="writing">
+    <h2 class="section-label">Writing — {postCount}</h2>
+    {POSTS.map((post) => <PostCard {...post} />)}
+    <p class="upcoming">next up — QuietNine: the launch story</p>
+  </section>
+</Base>
+
+<style>
+  .hero { padding: var(--space-8) 0 var(--space-7); }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-4);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--track-display);
+    max-width: 22ch;
+  }
+  .hero h1 em {
+    font-style: normal; /* Space Grotesk has no italic — emphasis is the accent */
+    color: var(--accent);
+  }
+  .hero .lead {
+    margin-top: var(--space-5);
+    font-size: var(--step-1);
+    color: var(--muted);
+    max-width: var(--measure);
+  }
+
+  .projects { margin-top: var(--space-8); }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+  }
+
+  .writing { margin-top: var(--space-8); }
+  .writing .upcoming {
+    margin-top: var(--space-4);
+    font-family: var(--font-mono); font-size: var(--step--1);
+    color: var(--muted-2);
+  }
+
+  @media (max-width: 720px) {
+    .hero { padding: var(--space-7) 0 var(--space-6); }
+    .hero h1 { font-size: var(--step-3); }
+    .projects-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+  }
+</style>

@@ -1,0 +1,212 @@
+---
+/**
+ * ABOUT — build plan step 5.
+ *
+ * Matches design/mocks/about.html rev 1. Copy is verbatim from
+ * ../../content/about.md — if a line here and a line there ever disagree,
+ * content/about.md is right.
+ *
+ * This page is the entity-consistency anchor (design plan §8): full name in
+ * the wordmark, <title> and the Person JSON-LD; the prose opens "I'm Alex."
+ * Scope rule (2026-08-15): article pages stay FLAT — hairlines on the ground,
+ * nothing floats. The photo is small and in the rail, not a hero (2026-08-12).
+ *
+ * Plate values are claims — every one must be literally true. The shipped
+ * count is rendered from the same arrays the home index renders, never typed.
+ */
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import photo from '../assets/alex-480.jpg';
+import { PROJECTS } from '../data/projects';
+import { POSTS } from '../data/posts';
+import { GITHUB_URL, LINKEDIN_URL, REPO_URL } from '../data/social';
+
+const shipped = `${PROJECTS.length} projects · ${POSTS.length} ${POSTS.length === 1 ? 'post' : 'posts'}`;
+
+/* Receipts — every link must resolve in the public repo. "research" is not
+   among them: research notes stay private, so the colophon doesn't claim them. */
+const RECEIPTS = [
+  { href: REPO_URL, label: 'the repo' },
+  { href: `${REPO_URL}/blob/main/design/directions.md`, label: 'directions A/B/C' },
+  { href: `${REPO_URL}/blob/main/design/tokens.css`, label: 'design system' },
+  { href: `${REPO_URL}/tree/main/design/mocks`, label: 'mocks' },
+];
+
+/* Person JSON-LD, build-time (build plan §2.5): full name, photo, sameAs →
+   GitHub + LinkedIn only. The App Store joins if/when Wayfare leaves
+   TestFlight. Same constants as the footer, so the two cannot drift. */
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Alex Young',
+  url: new URL('/about/', Astro.site).href,
+  image: new URL(photo.src, Astro.site).href,
+  sameAs: [GITHUB_URL, LINKEDIN_URL],
+};
+---
+
+<Base
+  title="About — Alex Young"
+  description="Product strategy for airport and lounge experience by day. By night: a travel app on TestFlight, a knowledge base my AI tools read and write, and a home server running the lot — all designed, built and shipped by me."
+>
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(personLd)} />
+
+  <section class="about-head">
+    <p class="eyebrow">About · Brisbane, AU</p>
+    <h1>I'm Alex.</h1>
+    <p class="lead">Brisbane, Australia — though regularly somewhere else in the country.</p>
+  </section>
+
+  <div class="about-body">
+    <div class="prose">
+      <p>By day I lead product strategy for airport and lounge experience at a
+         major airline. I'm not a career software engineer, and that's the
+         point. Everything on this site was designed, built and shipped by me
+         — mostly at night, mostly by seeing how far I could push an idea, then
+         learning enough to judge whether what came back was any good.</p>
+
+      <p>It started with a travel app and got out of hand. There's now a native
+         iOS app on TestFlight, a "brain" that holds my life's context and
+         serves it to whatever AI tool I'm using, and a home server in the
+         study handling DNS, backups and monitoring for the lot. When I say I
+         run my life on my own APIs, that's not a slogan — my itineraries, my
+         gym data and my server alerts all move through software I own.</p>
+
+      <p>One rule keeps it honest: nothing is "done" until I can explain how it
+         works without help. AI wrote plenty of the code; none of it ships
+         until I understand it. So what you'll read here is what I actually
+         learned — including the clunky parts, the decisions I'd take back, and
+         the occasional 2am rabbit hole.</p>
+
+      <p>The same instinct follows me away from the keyboard. I train
+         seriously, so of course I ended up building an automated dashboard
+         that tracks it. More on that another time.</p>
+
+      <p>Here you'll find case studies and build-in-public posts, a couple a
+         month at most, written when there's something worth saying.</p>
+    </div>
+
+    <aside class="rail" aria-label="At a glance">
+      <Image class="photo" src={photo} width={120} height={120} densities={[1, 2]} alt="Alex Young" />
+      <div class="plate">
+        <div><span class="k">Based</span><span class="v">Brisbane, AU</span></div>
+        <div><span class="k">Day job</span><span class="v">product strategy · airline</span></div>
+        <div><span class="k">Builds</span><span class="v">SwiftUI · Cloudflare · Proxmox</span></div>
+        <div><span class="k">Shipped</span><span class="v">{shipped}</span></div>
+        <div><span class="k">Status</span><span class="v ok">building · training</span></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="colophon-block">
+    <p>The site itself is one of the projects: Astro on Cloudflare, zero
+       JavaScript by default, and a design system shared with my iOS app that
+       will carry into whatever comes next. The rejected directions and the
+       mocks are committed alongside the code.</p>
+    <div class="receipts">
+      <span class="k">receipts —</span>
+      {RECEIPTS.map(({ href, label }) => <a href={href}>{label}</a>)}
+    </div>
+  </section>
+
+  <section class="close">
+    <p>If something here sparks a question, email me at <a
+         href="mailto:hello@alexyoung.com.au">hello@alexyoung.com.au</a> or
+       find me on <a href={GITHUB_URL}>GitHub</a> and <a
+         href={LINKEDIN_URL}>LinkedIn</a>. And if you're wondering whether you
+       could build something like this yourself… you can. It's far more
+       approachable than you think.</p>
+  </section>
+</Base>
+
+<style>
+  .about-head { padding: var(--space-8) 0 var(--space-6); }
+  .about-head h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-4);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--track-display);
+    margin-top: var(--space-3);
+  }
+  .about-head .lead {
+    margin-top: var(--space-4);
+    font-size: var(--step-1);
+    color: var(--muted);
+    max-width: var(--measure);
+  }
+
+  /* prose + rail: the rail is the survey-sheet margin — photo and facts */
+  .about-body {
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--space-6);
+    display: grid;
+    grid-template-columns: minmax(0, var(--measure)) 1fr;
+    gap: var(--space-8);
+    align-items: start;
+  }
+  .prose p { margin-bottom: var(--space-4); }
+  .prose p:last-child { margin-bottom: 0; }
+
+  .rail { position: sticky; top: 5rem; }
+  .photo {
+    display: block;
+    width: 120px; height: 120px;
+    object-fit: cover;
+    border: 1px solid var(--hairline);
+    /* square, radius-card 0 — matches the rest of the sheet; no circle here */
+  }
+  .plate {
+    margin-top: var(--space-5);
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+    max-width: 18rem;
+  }
+  .plate div {
+    display: grid; grid-template-columns: 5.5rem 1fr; gap: var(--space-3);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+  .plate .k {
+    font-size: var(--step--2);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--muted-2);
+    padding-top: 2px;
+  }
+  .plate .v { color: var(--ink); }
+  .plate .v.ok::before {
+    content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--ok); margin-right: var(--space-2); vertical-align: 1px;
+  }
+
+  .colophon-block {
+    margin-top: var(--space-7);
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--space-6);
+    max-width: var(--measure);
+  }
+  .receipts {
+    margin-top: var(--space-4);
+    display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4);
+    font-family: var(--font-mono); font-size: var(--step--1);
+  }
+  .receipts .k { color: var(--muted-2); }
+
+  .close { margin-top: var(--space-7); max-width: var(--measure); }
+  .close p { margin-bottom: var(--space-4); }
+
+  /* phone: rail folds in above the prose — small photo, then the plate
+     full-width so no fact wraps to three lines */
+  @media (max-width: 720px) {
+    .about-head { padding: var(--space-7) 0 var(--space-5); }
+    .about-head h1 { font-size: var(--step-3); }
+    .about-body { grid-template-columns: 1fr; gap: var(--space-5); }
+    .rail { position: static; order: -1; }
+    .photo { width: 88px; height: 88px; }
+    .plate { margin-top: var(--space-4); max-width: none; }
+    .plate div { grid-template-columns: 5rem 1fr; }
+  }
+</style>

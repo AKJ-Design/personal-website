@@ -1,0 +1,58 @@
+---
+/**
+ * Base layout — the HTML shell every page shares.
+ *
+ * Structure mirrors design/mocks/home.html exactly: the header is full-bleed
+ * with .page on its inner row, then one .page wrapper holds the content and the
+ * footer. Don't nest the header inside the wrapper — the blur and the bottom
+ * hairline need to run edge to edge.
+ */
+import { Font } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  /** Page title, without the site suffix. */
+  title: string;
+  /** Meta description. Required — build plan §2.5 wants one per page. */
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+/* Canonical tags, per §2.5. Astro.site comes from astro.config.mjs, so this is
+   correct on the workers.dev preview and on the custom domain without a flag. */
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="generator" content={Astro.generator} />
+
+    {/* Both faces preload: each is a single variable WOFF2 (22 KB / 40 KB) and
+        both are used above the fold — the wordmark is display, the nav is mono.
+        Body copy uses the system stack, so nothing here blocks first paint. */}
+    <Font cssVariable="--font-space-grotesk" preload />
+    <Font cssVariable="--font-jetbrains-mono" preload />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">skip to content</a>
+    <Header />
+    <div class="page">
+      <main id="main">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>

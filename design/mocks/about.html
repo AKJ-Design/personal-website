@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Alex Young</title>
+<style>
+/* =============================================================================
+   Step 3 mock — ABOUT · Field Notes Light · rev 1 (2026-08-23)
+   Tokens, base and header inlined from home.html rev 4 (self-contained mock).
+   Zero client-side JS. Copy verbatim from content/about.md.
+
+   Decisions this page leans on:
+   - Photo small, within the page, not a hero (2026-08-12): it sits in the
+     right-hand rail beside the prose, 120px; 88px at phone width.
+   - Colophon runs headless (Alex, 2026-08-23) — the hairline does the work.
+   - Scope rule (2026-08-15): article pages stay FLAT — hairlines on the ground,
+     nothing floats. Only index/link cards get elevation.
+   - Mono-for-facts: the rail carries a "data plate" of record-card facts.
+   - Entity consistency: full name lives in the wordmark, <title> and the
+     Person structured data (build-time); the prose opens "I'm Alex,".
+   ============================================================================= */
+
+:root {
+  --surface:        #FAF7F2;
+  --surface-raised: #FFFFFF;
+  --surface-sunk:   #F4F0E8;
+  --ink:        #141210;
+  --muted:      #57514A;
+  --muted-2:    #6B6358;
+  --accent:       #204E39;
+  --accent-light: #2D6A4F;
+  --on-accent:    #FFFFFF;
+  --hairline:      color-mix(in srgb, var(--accent) 20%, transparent);
+  --hairline-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --wash:        color-mix(in srgb, var(--accent) 14%, transparent);
+  --wash-strong: color-mix(in srgb, var(--accent) 24%, transparent);
+  --ok:   #2D6A4F;
+  --font-display: "Space Grotesk", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-body:    system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+
+  --step--2: 0.6875rem; --step--1: 0.8125rem; --step-0: 1rem;
+  --step-1: 1.1875rem;  --step-2: 1.5rem;     --step-3: 2.125rem; --step-4: 3rem;
+  --track-eyebrow: 0.16em; --track-label: 0.10em; --track-display: -0.024em;
+  --leading-tight: 1.04; --leading-head: 1.18; --leading-body: 1.6;
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.5rem;  --space-6: 2rem;   --space-7: 3rem;    --space-8: 4rem;
+  --radius-card: 0px;
+  --measure: 65ch;
+
+  /* Elevation — approved 2026-08-15, being promoted to tokens.css */
+  --shadow-1: 0 1px 2px rgba(20, 18, 16, 0.04), 0 4px 14px rgba(20, 18, 16, 0.06);
+  --shadow-2: 0 2px 4px rgba(20, 18, 16, 0.05), 0 12px 32px rgba(20, 18, 16, 0.09);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+::selection { background: var(--wash-strong); }
+
+html { background: var(--surface); }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.page {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+
+/* --- the accent thread: every interactive thing wears the green --- */
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { background: var(--wash); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* --- type roles --- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.section-label {
+  display: flex; align-items: center; gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--muted-2);
+  margin-bottom: var(--space-5);
+}
+.section-label::before { content: "+"; color: var(--muted-2); font-weight: 400; }
+.section-label::after { content: ""; flex: 1; border-top: 1px solid var(--hairline-soft); }
+
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------- header (sticky, full-bleed) */
+.site-head {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hairline);
+}
+.head-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: var(--space-3); padding-bottom: var(--space-3);
+}
+.brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; }
+.brand:hover { background: none; }
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--hairline);
+  flex-shrink: 0;
+}
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-1);
+  letter-spacing: var(--track-display);
+  color: var(--accent);
+  white-space: nowrap;
+}
+nav { display: flex; gap: var(--space-5); }
+nav a {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--ink);
+  text-decoration: none;
+}
+nav a:hover { background: var(--wash); color: var(--accent); }
+
+
+/* ---------------------------------------------------------------- page head */
+.about-head { padding: var(--space-8) 0 var(--space-6); }
+.about-head h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-4);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  margin-top: var(--space-3);
+}
+.about-head .lead {
+  margin-top: var(--space-4);
+  font-size: var(--step-1);
+  color: var(--muted);
+  max-width: var(--measure);
+}
+
+/* ------------------------------------------------------------ two columns
+   prose + rail. The rail is the survey-sheet margin: photo and facts. */
+.about-body {
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-6);
+  display: grid;
+  grid-template-columns: minmax(0, var(--measure)) 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+.prose p { margin-bottom: var(--space-4); }
+.prose p:last-child { margin-bottom: 0; }
+
+.rail { position: sticky; top: 5rem; }
+.photo {
+  display: block;
+  width: 120px; height: 120px;
+  object-fit: cover;
+  border: 1px solid var(--hairline);
+  /* square, radius-card 0 — matches the rest of the sheet; no circle here */
+}
+.plate {
+  margin-top: var(--space-5);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+  max-width: 18rem;
+}
+.plate div {
+  display: grid; grid-template-columns: 5.5rem 1fr; gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+.plate .k {
+  font-size: var(--step--2);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--muted-2);
+  padding-top: 2px;
+}
+.plate .v { color: var(--ink); }
+.plate .v.ok::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ok); margin-right: var(--space-2); vertical-align: 1px;
+}
+
+/* ----------------------------------------------------------------- colophon */
+.colophon-block {
+  margin-top: var(--space-7);
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-6);
+  max-width: var(--measure);
+}
+.receipts {
+  margin-top: var(--space-4);
+  display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4);
+  font-family: var(--font-mono); font-size: var(--step--1);
+}
+.receipts .k { color: var(--muted-2); }
+
+/* -------------------------------------------------------------------- close */
+.close { margin-top: var(--space-7); max-width: var(--measure); }
+.close p { margin-bottom: var(--space-4); }
+
+/* ------------------------------------------------------------------ footer */
+footer {
+  margin-top: var(--space-8);
+  border-top: 1px solid var(--hairline);
+  padding: var(--space-5) 0 var(--space-7);
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: var(--space-4);
+}
+footer .links { display: flex; gap: var(--space-4); }
+footer a { font-family: var(--font-mono); font-size: var(--step--1); }
+footer .colophon {
+  font-family: var(--font-mono); font-size: var(--step--2);
+  color: var(--muted-2);
+}
+
+
+/* ------------------------------------------------------------------- phone */
+@media (max-width: 720px) {
+  .about-head { padding: var(--space-7) 0 var(--space-5); }
+  .about-head h1 { font-size: var(--step-3); }
+  .head-row { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+  .avatar { width: 28px; height: 28px; }
+  .wordmark { font-size: var(--step-0); }
+  nav { gap: var(--space-3); }
+  nav a { font-size: 0.75rem; }
+
+  /* rail folds in above the prose: small photo, then the plate full-width so
+     no fact wraps to three lines */
+  .about-body { grid-template-columns: 1fr; gap: var(--space-5); }
+  .rail { position: static; order: -1; }
+  .photo { width: 88px; height: 88px; }
+  .plate { margin-top: var(--space-4); max-width: none; }
+  .plate div { grid-template-columns: 5rem 1fr; }
+
+  footer { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+  <header class="site-head">
+    <div class="page head-row">
+      <a class="brand" href="home.html">
+        <img class="avatar" src="../photo/alex-160.jpg" width="32" height="32" alt="">
+        <span class="wordmark">Alex Young</span>
+      </a>
+      <nav>
+        <a href="home.html#projects">projects</a>
+        <a href="home.html#writing">writing</a>
+        <a href="about.html" aria-current="page">about</a>
+      </nav>
+    </div>
+  </header>
+
+<div class="page">
+
+  <section class="about-head">
+    <p class="eyebrow">About · Brisbane, AU</p>
+    <h1>I'm Alex.</h1>
+    <p class="lead">Brisbane, Australia — though regularly somewhere else in the country.</p>
+  </section>
+
+  <div class="about-body">
+
+    <div class="prose">
+      <p>By day I lead product strategy for airport and lounge experience at a
+         major airline. I'm not a career software engineer, and that's the
+         point. Everything on this site was designed, built and shipped by me
+         — mostly at night, mostly by seeing how far I could push an idea, then
+         learning enough to judge whether what came back was any good.</p>
+
+      <p>It started with a travel app and got out of hand. There's now a native
+         iOS app on TestFlight, a "brain" that holds my life's context and
+         serves it to whatever AI tool I'm using, and a home server in the
+         study handling DNS, backups and monitoring for the lot. When I say I
+         run my life on my own APIs, that's not a slogan — my itineraries, my
+         gym data and my server alerts all move through software I own.</p>
+
+      <p>One rule keeps it honest: nothing is "done" until I can explain how it
+         works without help. AI wrote plenty of the code; none of it ships
+         until I understand it. So what you'll read here is what I actually
+         learned — including the clunky parts, the decisions I'd take back, and
+         the occasional 2am rabbit hole.</p>
+
+      <p>The same instinct follows me away from the keyboard. I train
+         seriously, so of course I ended up building an automated dashboard
+         that tracks it. More on that another time.</p>
+
+      <p>Here you'll find case studies and build-in-public posts, a couple a
+         month at most, written when there's something worth saying.</p>
+    </div>
+
+    <aside class="rail" aria-label="At a glance">
+      <img class="photo" src="../photo/alex-480.jpg" width="120" height="120" alt="Alex Young">
+      <!-- Record-card facts. Mono-for-facts; every value must be literally
+           true at build time. "Shipped" count = cards on the home index. -->
+      <div class="plate">
+        <div><span class="k">Based</span><span class="v">Brisbane, AU</span></div>
+        <div><span class="k">Day job</span><span class="v">product strategy · airline</span></div>
+        <div><span class="k">Builds</span><span class="v">SwiftUI · Cloudflare · Proxmox</span></div>
+        <div><span class="k">Shipped</span><span class="v">6 projects · 1 post</span></div>
+        <div><span class="k">Status</span><span class="v ok">building · training</span></div>
+      </div>
+    </aside>
+
+  </div>
+
+  <section class="colophon-block">
+    <p>The site itself is one of the projects: Astro on Cloudflare, zero
+       JavaScript by default, and a design system shared with my iOS app that
+       will carry into whatever comes next. The research, the rejected
+       directions and the mocks are all committed alongside the code.</p>
+    <div class="receipts">
+      <span class="k">receipts —</span>
+      <a href="#">the repo</a>
+      <a href="#">research</a>
+      <a href="#">directions A/B/C</a>
+      <a href="#">design system</a>
+      <a href="#">mocks</a>
+    </div>
+  </section>
+
+  <section class="close">
+    <p>If something here sparks a question, email me at
+       <a href="mailto:hello@alexyoung.com.au">hello@alexyoung.com.au</a> or
+       find me on <a href="#">GitHub</a> and <a href="#">LinkedIn</a>. And if
+       you're wondering whether you could build something like this yourself…
+       you can. It's far more approachable than you think.</p>
+  </section>
+
+  <footer>
+    <div class="links">
+      <a href="mailto:hello@alexyoung.com.au">email</a>
+      <a href="#">github</a>
+      <a href="#">linkedin</a>
+    </div>
+    <span class="colophon">built by hand, no template · © 2026 Alex Young</span>
+  </footer>
+
+</div>
+</body>
+</html>
