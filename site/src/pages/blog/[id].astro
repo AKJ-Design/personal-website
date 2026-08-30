@@ -157,6 +157,32 @@ const meta = postMeta(post);
     margin: var(--space-5) 0 var(--space-6);
     padding: var(--space-4);
   }
+
+  /* real screenshots: the frame goes solid and hugs the image; every shot
+     links to its full-size file — browser-native "tap to enlarge", no JS */
+  .post-body :global(figure.shot:has(img)) {
+    background: none; border: none; padding: 0; min-height: 0; display: block;
+  }
+  .post-body :global(figure.shot a) { display: block; width: fit-content; }
+  .post-body :global(figure.shot a:hover) { background: none; }
+  .post-body :global(figure.shot img) {
+    display: block; width: 100%; height: auto;
+    border: 1px solid var(--hairline);
+  }
+  /* phone-shaped shots don't get the full measure */
+  .post-body :global(figure.shot.portrait a) { margin: 0 auto; }
+  .post-body :global(figure.shot.portrait img) { width: 320px; }
+  .post-body :global(figure.shot:has(img) figcaption) { margin-top: var(--space-2); }
+
+  /* the disclosure's thumbnail readout */
+  .post-body :global(.prompt-thumb) { margin: var(--space-3) 0 0; }
+  .post-body :global(.prompt-thumb a) { display: block; width: fit-content; }
+  .post-body :global(.prompt-thumb a:hover) { background: none; }
+  .post-body :global(.prompt-thumb img) {
+    width: 260px; height: auto; display: block;
+    border: 1px solid var(--hairline);
+  }
+  .post-body :global(pre code) { font: inherit; }
   .post-body :global(figure.shot figcaption),
   .post-body :global(figure.diagram figcaption) {
     font-family: var(--font-mono);

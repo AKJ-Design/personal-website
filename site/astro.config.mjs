@@ -13,6 +13,11 @@ export default defineConfig({
      until then. */
   integrations: [sitemap()],
 
+  /* No code on this site's pages — the fenced blocks in posts are prompts,
+     prose styled by the post layout's own pre rules. Shiki would inject its
+     own theme as inline styles and fight them. */
+  markdown: { syntaxHighlight: false },
+
 
   /* imageService: 'compile' — every image on this site is a local file known at
      build time (the photo, the six card visuals, the post screenshots), so they

@@ -10,8 +10,22 @@ next: 'Part 2 — chat to native iOS app · coming soon'
 The very first thing I ever asked Claude to do was find me flights to Bangkok. Not "help me build an app" — just cheap flights in the next two months, with my usual list of picky requirements. Some back-and-forth later, I had flights that ticked every box. Boom, done.
 
 <details class="prompt">
-  <summary>tap to see the actual prompt</summary>
-  <pre>[Alex's real flight-search prompt goes here — pulled from the chat]</pre>
+<summary>tap to see the actual prompt</summary>
+
+```
+I want you to search the internet for flight options.
+Find return flight options from either Brisbane, Sydney or Melbourne to Bangkok, departing between now and end of August. Preference for Brisbane departure (home). Flights must depart on a wednesday, thursday or friday from australia.
+Trip duration is 5 days, Ideal is thursday to tuesday.
+flights must not arrive into bangkok later than 9pm.
+No more than one stop, unless the stop is within australia.
+Pricing below $1,800 return.
+Preference is for Singapore airlines, to take advantage of related frequent flyer status, but willing to forgo this for a good flight deal on a decent carrier.
+
+Ask questions first to clarify the search before starting.
+```
+
+<p class="prompt-thumb"><a href="/images/wayfare/flight-options.jpg" title="tap to enlarge"><img src="/images/wayfare/flight-options.jpg" alt="Claude's flight options readout: Singapore Airlines via Singapore recommended at around AUD 920–1,100 return, a direct Jetstar alternative, and a grid of eligible Thursday departure dates" width="1000" height="1445" loading="lazy" /></a></p>
+
 </details>
 
 Two months later, that throwaway prompt has somehow become a native iOS travel app with its own database, its own API, and a live connection to Claude.
@@ -40,9 +54,17 @@ So this time I gave Claude that challenge: Build a visual itinerary that I can k
 
 It presented me with a few options and the readout on each: HTML artifact, Excel spreadsheet, Word doc and Markdown file. Its recommendation was for HTML artifact because in its words, "visually clean, can include a day-tracker, color tags per category, and is easy to glance at on your phone. I can keep modifying it in place as you firm up bookings (flights, Muay Thai night, club nights, etc.)."
 
-<figure class="shot"><figcaption>Screenshot — options readout in chat</figcaption></figure>
+<figure class="shot">
+  <a href="/images/wayfare/options-readout.jpg" title="tap to enlarge"><img src="/images/wayfare/options-readout.jpg" alt="Claude's options readout comparing an HTML artifact, an Excel spreadsheet, a Word doc and a Markdown file — recommending the HTML artifact for a visual, phone-friendly itinerary" width="1200" height="809" loading="lazy" /></a>
+  <figcaption>Screenshot — options readout in chat</figcaption>
+</figure>
 
 ## iPhones hate HTML
+
+<figure class="shot">
+  <a href="/images/wayfare/html-itinerary.jpg" title="tap to enlarge"><img src="/images/wayfare/html-itinerary.jpg" alt="Claude delivering the Bangkok itinerary as an HTML file — day pills to flip between the eight days, colour-tagged categories, and a note field on every card" width="1200" height="823" loading="lazy" /></a>
+  <figcaption>Screenshot — the itinerary, delivered as an HTML file</figcaption>
+</figure>
 
 There I had it, an interactive, visually appealing, mobile friendly and usable itinerary that presented as a webpage. It had colour coded activities, tabs for each day, a notes section to type in booking references or other info and important facts like walking distance from my hotel and what to wear (some places had a dress code). But there was one annoying issue: iPhones don't like HTML files. Nothing built into iOS would open my itinerary — Safari on my Mac rendered it happily, Safari on my iPhone wouldn't touch it. I ended up installing Microsoft Edge, one of the few iPhone browsers that would open the file at all.
 
@@ -52,7 +74,10 @@ And that's what I did. I had Claude compare free hosting options — and how muc
 
 Now my itinerary lived at its own private URL. I even used Safari's "Add to Home Screen", which made it look and behave like an app — the technical name is a Progressive Web App, or PWA. One downside remained: every time Claude generated an update, I had to drop the new file into Cloudflare myself. A sixty-second job. Not seamless, but low effort.
 
-<figure class="shot"><figcaption>Screenshot — the PWA on the Home Screen</figcaption></figure>
+<figure class="shot portrait">
+  <a href="/images/wayfare/pwa-home-screen.jpg" title="tap to enlarge"><img src="/images/wayfare/pwa-home-screen.jpg" alt="An iPhone Home Screen with the itinerary saved as an app named Travel" width="800" height="1738" loading="lazy" /></a>
+  <figcaption>Screenshot — the PWA on the Home Screen</figcaption>
+</figure>
 
 ## An idea, a goal and a plan
 
@@ -93,7 +118,10 @@ There I had it… my own interactive travel itinerary app, sitting as an 'app' (
 
 If I had a new idea — say, a walking food tour for day 3 of my trip — I could be anywhere and use Claude chat to research options. It would scan TripAdvisor reviews, read blog posts and search Google to present a few ideas, with details like how far it was from the hotel and the price. I'd decide or amend and then it would automatically add it to my itinerary. And it was there, seconds later, in my itinerary app, with no further effort from me. It was simple, fun and legitimately useful — both while planning and mid-trip.
 
-<figure class="shot"><figcaption>Screenshot — the finished itinerary app</figcaption></figure>
+<figure class="shot portrait">
+  <a href="/images/wayfare/finished-app.jpg" title="tap to enlarge"><img src="/images/wayfare/finished-app.jpg" alt="The itinerary app's Today view mid-trip — hotel and flight details pixelated at source" width="640" height="800" loading="lazy" /></a>
+  <figcaption>Screenshot — the finished itinerary app</figcaption>
+</figure>
 
 But then I started to think, what if I made this into a native iOS app? Could I then build custom widgets and use Live Activities? All from this little idea of an interactive itinerary…? Well the answer is yes, and the easier half of the story when you have a clear goal.
 
