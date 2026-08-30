@@ -80,7 +80,18 @@ Plan: `personal-plans/website-build-plan.md` (rev 1, accepted 2026-08-27). Code 
       `site/src/data/social.ts`, four-link receipts row into this repo. Verified against the
       production build at 1280 and 375; the JSON-LD block is the page's only `<script>`. Same
       step: the repo went **public with a fresh history** — see the closed gates below
-- [ ] **6 — Blog** (next): content collection, post layout, Wayfare Part 1, RSS, sitemap, OG
+- [x] **6 — Blog** (2026-08-30). Content collection (`site/src/content/blog/`, slugs frozen),
+      post layout from `design/mocks/wayfare-part-1.html` (accent eyebrow, mono meta, flat
+      article, prompts as `<pre>`, the opener a native `<details>` disclosure), `/blog/` index
+      derived from the home Writing section, RSS at `/rss.xml` and a sitemap (both XML-validated),
+      OG cards generated pre-build by `site/scripts/generate-og.mjs` (the Cloudflare adapter
+      prerenders inside workerd, which forbids satori's WASM — OG cannot be an Astro endpoint).
+      **Wayfare Part 1 live** with the real flight-search prompt, real screenshots (redacted at
+      the pixel or the text), and two CSS-only replay figures — the chat replay
+      (`scripts/generate-replay.mjs` → `styles/replay.css`, one 28.5s master timeline) and the
+      delivered-then-opened file (`styles/delivery.css`, 20s). Zero script tags throughout;
+      reduced motion gets each replay's finished state as a static figure
+- [ ] **7 — Strip, live** (next): KV namespace, snapshot script, launchd job, home un-prerendered
 
 Steps 5–6 (About, blog) continue the Claude-driven stretch; 7–10 (live strip, custom
 domain, launch check, cross-post) are paired. Full sequence in the build plan §3.
@@ -123,16 +134,18 @@ Found 2026-08-28 in the pre-step-3 review. Each names the step it must close by.
   that named private infrastructure were reworded to state each rule by mechanism, and public
   history restarts from a clean initial commit (the full prior history is archived privately
   beside the plans). The detailed redaction rules live in the private build plan, not here.
-- **Wayfare Part 1 assets — by step 6.** The draft (now in the private plans folder with the
-  other unpublished content; it enters the repo when the post ships) carries four
-  `[screenshot here]`, one `[image/diagram here]` and an unfilled flight-search prompt; the post
-  mock has the matching empty `<figure class="shot">` frames. **Alex gathers the screenshots and the prompt in
-  parallel with steps 3–5** (each needs the same redaction pass the Wayfare card visual got);
-  Claude draws the Claude ↔ Cloudflare ↔ MCP loop as an in-system SVG.
-- **OG image template — by step 6.** Build plan §2.5 assumes one exists "in the design system".
-  It does not — nothing in `design/` is 1200×630. Needs designing before OG generation.
-- **`/blog/` index — by step 6** has no mock. Derive it from the home page's "Writing — 01"
-  section rather than mocking it separately.
+- **Wayfare Part 1 assets — closed 2026-08-30 (step 6).** Real prompt and screenshots in, each
+  redacted before it shipped: hotel identifiers pixelated at source or removed from the text
+  itself (the itinerary capture is a re-render of the real HTML with names and flight numbers
+  scrambled first — no blur needed). Two frames became CSS replay figures rather than static
+  shots; the loop diagram is an in-system SVG. Source material and design exports stay in the
+  private plans folder.
+- **OG image template — closed 2026-08-30 (step 6).** Designed in code:
+  `site/scripts/generate-og.mjs` — mono eyebrow, Space Grotesk title on the warm ground, green
+  rule, wordmark + domain. Runs before `astro build`; PNGs land in `site/public/og/`
+  (gitignored) as static assets.
+- **`/blog/` index — closed 2026-08-30 (step 6).** Derived from the home Writing section as
+  decided; no separate mock.
 - **404 copy — by step 9** not written.
 - **GitHub + LinkedIn URLs — closed 2026-08-30 (step 5).** Both live in
   `site/src/data/social.ts`, imported by the footer and by /about's `Person` `sameAs` so the two
@@ -210,6 +223,24 @@ npx wrangler deploy --dry-run
   names `SESSION` or `IMAGES`, an adapter default has been re-enabled — see `site/README.md`.
 - **The dev server backgrounds itself.** Astro 7 returns immediately from `astro dev`; Ctrl-C
   does nothing. Use `npx astro dev status` / `logs` / `stop`.
+- **Writing a post** (the build plan §4 exit test): add one Markdown file to
+  `site/src/content/blog/` — frontmatter needs `title`, `date`, `eyebrow`, `excerpt`, `tags`,
+  optional `next` (the endplate line). The filename is the frozen slug (`/blog/<name>/`).
+  Push to `main`; the build generates its OG card, the feed entry, the sitemap row, and the
+  home + `/blog/` index cards automatically — counts and reading time are computed, never
+  typed. Post images go in `site/public/images/<post>/`, referenced from raw-HTML
+  `<figure class="shot">` blocks (see Wayfare Part 1 for the pattern); anything personal gets
+  its redaction pass *before* the file enters the repo.
+- **`npm run build` runs `scripts/generate-og.mjs` first.** OG cards cannot be an Astro
+  endpoint on this stack — the Cloudflare adapter prerenders inside a workerd sandbox, which
+  disallows satori's WASM and resvg's native binding. If a build fails before Astro starts,
+  look at that script; its PNGs land in `site/public/og/` (gitignored).
+- **The replay figures are CSS-only and generated.** The chat replay's 400 lines of keyframes
+  come from `site/scripts/generate-replay.mjs` — edit the generator and re-run it, never
+  `styles/replay.css` directly (`styles/delivery.css` is small and hand-maintained). One trap,
+  cost an hour on 2026-08-30: the CSS minifier deletes a name-less `animation:` shorthand as a
+  no-op, silently killing any stagger built on a shared base rule + per-child
+  `animation-name` — always write the full shorthand per element.
 - **Triaging a failed build — read the clock first.** A failure inside ~3 seconds, during
   *"Initializing build environment"*, is environment or auth: it died before your code was even
   fetched. The one already hit is a **stale Cloudflare build token** ("the build token selected
