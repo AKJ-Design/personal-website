@@ -1,37 +1,64 @@
 /* =============================================================================
    "Delivered as a file, then opened" — the second replay figure in Wayfare
    Part 1. Hand-authored (unlike replay.css it is small enough to maintain
-   directly); same rules as the big replay: one master timeline (14s), every
+   directly); same rules as the big replay: one master timeline (20s), every
    element keyed as percentages of it, zero JS, and prefers-reduced-motion
    (which replay.css already handles for everything inside .rp) falls back to
    the base styles — here, the opened itinerary as a static figure.
 
-   The sequence: the delivery message whips up through the frame (2.4s), the
-   file card lands centre (2.3s–5.6s) and its button takes a press (4.5s),
-   then the card gives way to the itinerary file, which pans slowly (6.5s to
-   12.8s), holds, and fades for the loop.
+   The sequence: the delivery message settles in a paragraph at a time
+   (0.3s / 1.5s / 2.7s / 4.2s) and holds readable until 6.8s, slides away,
+   the file card lands (7.4s) and its button takes a press (9.2s), then the
+   card gives way to the itinerary file, which pans slowly (11.4s to 18.2s),
+   holds, and fades for the loop.
 
    Shares .rp (stage, ground, palette) from replay.css. Sizes in cqw against
    the same 1920-wide design space.
    ========================================================================= */
 
-/* ------------------------------------------------------------- the whip -- */
-.dl-whip {
-  position: absolute; left: 18.75cqw; width: 62.5cqw;
+/* -------------------------------------------------------- the message ---- */
+.dl-msg {
+  position: absolute; left: 18.75cqw; top: 8.5cqw; width: 62.5cqw;
   font-family: var(--font-body); font-size: 1.875cqw; line-height: 1.55;
   color: #F3ECE1;
-  /* base = post-whip: gone. Screen readers still get the text (opacity). */
-  opacity: 0; transform: translateY(-115cqw);
-  animation: dl-whip 14s linear infinite;
+  /* base = post-exit: gone. Screen readers still get the text (opacity). */
+  opacity: 0; transform: translateY(-6cqw);
+  animation: dl-msg 20s linear infinite;
 }
-.dl-whip p { margin: 0 0 2cqw; }
-@keyframes dl-whip {
-  0%, 1.4% { opacity: 1; transform: translateY(58cqw); filter: blur(0);
-             animation-timing-function: cubic-bezier(0.55, 0, 0.65, 1); }
-  5%       { filter: blur(0.3cqw); }
-  15%      { filter: blur(0.3cqw); }
-  18.5%    { opacity: 1; transform: translateY(-115cqw); filter: blur(0); }
-  19%, 100% { opacity: 0; transform: translateY(-115cqw); }
+.dl-msg p { margin: 0 0 2cqw; }
+/* full shorthand per paragraph — a name-less `animation:` base rule gets
+   optimized away as a no-op by the CSS minifier */
+.dl-msg p:nth-child(1) { animation: dl-p1 20s linear infinite; }
+.dl-msg p:nth-child(2) { animation: dl-p2 20s linear infinite; }
+.dl-msg p:nth-child(3) { animation: dl-p3 20s linear infinite; }
+.dl-msg p:nth-child(4) { animation: dl-p4 20s linear infinite; }
+/* container: visible through the paragraph builds, slides away at 6.8s */
+@keyframes dl-msg {
+  0%       { opacity: 1; transform: translateY(0); }
+  34%      { opacity: 1; transform: translateY(0);
+             animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19); }
+  37%, 100% { opacity: 0; transform: translateY(-6cqw); }
+}
+/* paragraphs: each rises in on its beat, then holds (the container exits) */
+@keyframes dl-p1 {
+  0%, 1.5% { opacity: 0; transform: translateY(1.6cqw);
+             animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+  4%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes dl-p2 {
+  0%, 7.5%   { opacity: 0; transform: translateY(1.6cqw);
+               animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+  10.5%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes dl-p3 {
+  0%, 13.5%  { opacity: 0; transform: translateY(1.6cqw);
+               animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+  16.5%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes dl-p4 {
+  0%, 21%  { opacity: 0; transform: translateY(1.6cqw);
+             animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+  24%, 100% { opacity: 1; transform: translateY(0); }
 }
 
 /* -------------------------------------------------------- the file card -- */
@@ -41,18 +68,18 @@
   background: #16151A; border: 1px solid rgba(201, 161, 95, 0.16);
   border-radius: 0.8cqw; padding: 1.7cqw 2.2cqw;
   opacity: 0; transform: translate(-50%, -50%) scale(1);
-  animation: dl-card 14s linear infinite;
+  animation: dl-card 20s linear infinite;
 }
 @keyframes dl-card {
-  0%, 16.4% { opacity: 0; transform: translate(-50%, -48.5%) scale(0.94);
-              animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
-  20%       { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  32.1%     { transform: translate(-50%, -50%) scale(1); }
-  32.7%     { transform: translate(-50%, -50%) scale(0.98); }
-  33.2%     { transform: translate(-50%, -50%) scale(1); }
-  36.4%     { opacity: 1; transform: translate(-50%, -50%) scale(1);
-              animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19); }
-  40.4%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.07); }
+  0%, 37%  { opacity: 0; transform: translate(-50%, -48.5%) scale(0.94);
+             animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+  39.5%    { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  46%      { transform: translate(-50%, -50%) scale(1); }
+  46.4%    { transform: translate(-50%, -50%) scale(0.98); }
+  46.9%    { transform: translate(-50%, -50%) scale(1); }
+  49.5%    { opacity: 1; transform: translate(-50%, -50%) scale(1);
+             animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19); }
+  52.25%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.07); }
 }
 .dl-ico {
   display: grid; place-items: center;
@@ -66,12 +93,12 @@
   font-family: var(--font-mono); font-size: 1.2cqw; letter-spacing: 0.04em;
   color: #C9A15F; border: 1px solid #C9A15F; border-radius: 99cqw;
   padding: 0.7cqw 1.5cqw; margin-left: 1.2cqw; white-space: nowrap;
-  animation: dl-btn 14s linear infinite;
+  animation: dl-btn 20s linear infinite;
 }
 @keyframes dl-btn {
-  0%, 32.1% { background: transparent; color: #C9A15F; }
-  32.5%, 33% { background: #C9A15F; color: #0B0A0D; }
-  33.4%, 100% { background: transparent; color: #C9A15F; }
+  0%, 46% { background: transparent; color: #C9A15F; }
+  46.3%, 46.8% { background: #C9A15F; color: #0B0A0D; }
+  47.2%, 100% { background: transparent; color: #C9A15F; }
 }
 
 /* ------------------------------------------------------- the opened file -- */
@@ -82,13 +109,13 @@
   background: #16151A;
   /* base = the static figure reduced-motion readers get */
   opacity: 1; transform: translate(-50%, -50%) scale(1);
-  animation: dl-phone 14s linear infinite;
+  animation: dl-phone 20s linear infinite;
 }
 @keyframes dl-phone {
-  0%, 40% { opacity: 0; transform: translate(-50%, -48%) scale(0.97);
-            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
-  45%     { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  95.4%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  0%, 51.5% { opacity: 0; transform: translate(-50%, -48%) scale(0.97);
+              animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+  55%      { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  96.5%    { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   99.5%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
 .dl-phone img {
@@ -96,10 +123,10 @@
   /* rendered height 72cqw in a 44cqw window → full pan is -38.9% of the
      image; base holds a mid-scroll frame for the static fallback */
   transform: translateY(-20%);
-  animation: dl-pan 14s linear infinite;
+  animation: dl-pan 20s linear infinite;
 }
 @keyframes dl-pan {
-  0%, 46.4% { transform: translateY(0);
-              animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1); }
-  91.4%, 100% { transform: translateY(-38.9%); }
+  0%, 57% { transform: translateY(0);
+            animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1); }
+  91%, 100% { transform: translateY(-38.9%); }
 }

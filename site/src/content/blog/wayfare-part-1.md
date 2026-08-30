@@ -93,7 +93,7 @@ It presented me with a few options and the readout on each: HTML artifact, Excel
 
 <figure class="replay">
 <div class="rp dl">
-<div class="dl-whip">
+<div class="dl-msg">
 <p>Here's your interactive itinerary. A few things about how it works:</p>
 <p>Tap the day pills along the top to flip between the 8 days. Each event is color-tagged by category, and every card has a small note field you can type into directly.</p>
 <p>What's locked in: your flights, the transfers, the breakfast → gym → pool → lunch rhythm, the Saturday Chatuchak slot, club nights on 1–2 Aug, and Muay Thai at Rajadamnern on 4 Aug.</p>
