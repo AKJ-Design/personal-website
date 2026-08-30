@@ -1,0 +1,343 @@
+<!-- @dsCard group="Colour" name="Semantic colour" subtitle="ok / warn / crit — not the accent" -->
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semantic colour — Field Notes Light</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ---- tokens.css, inlined verbatim from design/tokens.css ---- */
+/* =============================================================================
+   Design tokens — shared spine, two themes
+   Locked 2026-08-15. See design-system.md for the reasoning behind every value.
+
+   ARCHITECTURE
+   The spine is the semantic vocabulary below: every consumer styles against
+   --surface / --ink / --accent / --hairline / --radius-* / --step-*, never
+   against a literal. A theme is then nothing but a re-binding of those names.
+   That is what lets a light website and a dark iOS app share one system without
+   either being a compromise.
+
+   THE ONE RULE THAT MATTERS
+   --accent does ALL interactive work. Links, focus, selection, marks, filled
+   controls, the live strip's labels, card accents. If something is interactive
+   it wears the accent; if it wears the accent it should be interactive. The
+   moment a second colour starts doing interactive work, the thread is dead and
+   so is the identity.
+
+   SEMANTIC COLOUR IS SEPARATE and is NOT the accent. See --ok / --warn / --crit.
+   In Field Notes Light --ok is deliberately NOT --accent, so "green = success"
+   can never collide with "green = interactive".
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   THEME: Field Notes Light — the personal website, and every Office document.
+   This is the default binding; :root IS the light theme.
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* --- surfaces, lightest to most recessed --- */
+  --surface:        #FAF7F2;  /* warm off-white ground */
+  --surface-raised: #FFFFFF;  /* floating cards (see elevation below); article
+                                 pages still prefer sunk-on-ground */
+  --surface-sunk:   #F4F0E8;  /* code blocks, callouts, placeholder frames */
+
+  /* --- ink --- */
+  --ink:        #141210;  /* 17.49:1 — body and headings */
+  --ink-strong: #000000;  /* reserved; light theme rarely needs it */
+  --muted:      #57514A;  /*  7.33:1 — secondary prose, captions. AAA. */
+
+  /* #6B6358, NOT the #8A8177 this started as. The lighter stone measured
+     3.58:1 — fine for a hairline, but it FAILS AA for the 11px uppercase
+     labels it exists to colour (small text needs 4.5:1; the 3:1 large-text
+     allowance needs 24px, or 18.7px bold). This value is 5.53:1, which also
+     puts it in the same relationship to --muted as Wayfare Dark's --muted-2
+     (5.49:1) is to its own. Exactly the failure Theme.swift caught and fixed
+     when it replaced #7D7669 — do not revert it for being "too dark". */
+  --muted-2:    #6B6358;  /*  5.53:1 — labels and hairlines. Never body copy. */
+
+  /* --- the accent thread --- */
+  --accent:       #204E39;  /* 8.89:1 on surface (AAA) */
+  --accent-light: #2D6A4F;  /* 5.98:1 — AA, not AAA. Hover/active lift only:
+                               it is not a drop-in text substitute for accent. */
+  --on-accent:    #FFFFFF;  /* 9.50:1 on accent (AAA) */
+
+  /* Hairlines are the accent at low alpha, NOT a grey. This is the single
+     biggest reason the surfaces read warm and intentional rather than default.
+     Ported from Wayfare, where --panel-line is the gold at 16%. */
+  --hairline:      color-mix(in srgb, var(--accent) 20%, transparent);  /* visible rules */
+  --hairline-soft: color-mix(in srgb, var(--accent) 10%, transparent);  /* internal dividers */
+
+  /* Selection + marker hover: the accent as a wash, never a fill.
+     wash-strong must stay clearly above --hairline, or a selected run of text
+     reads as a boxed-in border rather than a highlight. */
+  --wash:        color-mix(in srgb, var(--accent) 14%, transparent);  /* hover */
+  --wash-strong: color-mix(in srgb, var(--accent) 24%, transparent);  /* selection */
+
+  /* --- elevation — locked 2026-08-15, from the home mock's depth pass ---
+     Cards float: --surface-raised + shadow-1, hover lifts to shadow-2 with the
+     title turning --accent (the interactive cue stays green). Square corners
+     keep the float from going soft. USE SPARINGLY: index/link cards only.
+     The live strip and article pages stay flat hairlines-on-ground — if
+     everything floats, nothing does. Shadows are ink-tinted, never neutral
+     grey, so they read warm on the warm ground. */
+  --shadow-1: 0 1px 2px rgba(20, 18, 16, 0.04), 0 4px 14px rgba(20, 18, 16, 0.06);
+  --shadow-2: 0 2px 4px rgba(20, 18, 16, 0.05), 0 12px 32px rgba(20, 18, 16, 0.09);
+
+  /* --- semantic, deliberately NOT the accent --- */
+  --ok:   #2D6A4F;  /* 5.98:1 — only where "success" must read as such */
+  --warn: #8A5A1E;  /* 5.52:1 */
+  --crit: #A32E28;  /* 6.60:1 */
+
+  /* --- type --- */
+  --font-display: "Space Grotesk", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-body:    system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+
+  /* Space Grotesk ships NO italic. Never set font-style: italic on display
+     type — the browser fakes an oblique and it looks like a bug. Use weight,
+     size or the accent for emphasis instead. */
+}
+
+/* -----------------------------------------------------------------------------
+   SPINE — theme-independent. These do not change between themes, by design:
+   a system whose spacing and rhythm shift per theme is two systems.
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Type scale — 1.185 ratio, tuned so mono at --step--1 optically matches
+     body at --step-0 (JetBrains Mono runs large for its point size). */
+  --step--2: 0.6875rem;  /* 11px — eyebrows, strip keys */
+  --step--1: 0.8125rem;  /* 13px — meta, captions, table data */
+  --step-0:  1rem;       /* 16px — body */
+  --step-1:  1.1875rem;  /* 19px — lead paragraph */
+  --step-2:  1.5rem;     /* 24px — section heading */
+  --step-3:  2.125rem;   /* 34px — page heading */
+  --step-4:  3rem;       /* 48px — display */
+
+  /* Tracking. Uppercase mono labels need it; body never does. */
+  --track-eyebrow: 0.16em;  /* the loudest label — from Wayfare's eyebrowStyle */
+  --track-label:   0.10em;  /* section labels — Wayfare's sectionLabelStyle */
+  --track-display: -0.024em;
+
+  --leading-tight: 1.04;
+  --leading-head:  1.18;
+  --leading-body:  1.6;
+
+  /* Spacing — 4px base. */
+  --space-1: 0.25rem;  --space-2: 0.5rem;   --space-3: 0.75rem;
+  --space-4: 1rem;     --space-5: 1.5rem;   --space-6: 2rem;
+  --space-7: 3rem;     --space-8: 4rem;
+
+  /* Radius — Wayfare's --radius-lg/md/sm, unchanged. */
+  --radius-lg: 20px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-flat: 0px;  /* Field Notes Light uses square corners; see note below */
+
+  --measure: 65ch;     /* running text never exceeds this */
+}
+
+/* -----------------------------------------------------------------------------
+   THEME: Wayfare Dark — the iOS app. Transcribed from
+   Wayfare/Shared/Support/Theme.swift, itself a faithful port of the PWA's
+   :root, itself from the original Claude Design handoff. Do not improvise here:
+   these values have a provenance chain and a documented AA fix inside them.
+
+   Apply with [data-theme="wayfare"] or import into a dark-only context.
+   -------------------------------------------------------------------------- */
+
+[data-theme="wayfare"] {
+  --surface:        #0B0A0D;
+  --surface-raised: #131217;
+  --surface-sunk:   #16151A;
+
+  --ink:        #F3ECE1;
+  --ink-strong: #F6F0E6;
+  --muted:      #A89E8F;
+
+  /* #8F8676, NOT #7D7669. The original computed to 4.39:1 against --surface,
+     just under AA's 4.5:1; this hits 5.49:1. Reverting silently fails AA. */
+  --muted-2:    #8F8676;
+
+  --accent:       #C9A15F;
+  --accent-light: #E3C088;
+
+  /* The accent's own gold darkened — warm, so it reads as belonging to the
+     gold it sits on. NOT --surface (#0B0A0D), which is cool. This distinction
+     was missed once already in Wayfare's Stage 3b. */
+  --on-accent:    #1A1409;
+
+  /* 16% is transcribed from Theme.swift's --panel-line and is NOT a free
+     choice — leave it. The wash pair is not in the source, so it matches the
+     light theme's 14/24 for consistency. */
+  --hairline:      color-mix(in srgb, var(--accent) 16%, transparent);
+  --hairline-soft: color-mix(in srgb, var(--accent) 8%,  transparent);
+  --wash:          color-mix(in srgb, var(--accent) 14%, transparent);
+  --wash-strong:   color-mix(in srgb, var(--accent) 24%, transparent);
+
+  /* Elevation: a dark theme lifts with lighter surfaces, not shadows —
+     --surface-raised does the work; the shadow tokens resolve to nothing. */
+  --shadow-1: none;
+  --shadow-2: none;
+
+  /* The filled Done state. NOT the same as the explore category colour
+     (#5DAD70) — a state must not share identity with a category. */
+  --ok:   #69BA7C;
+  --warn: #E28D4F;
+  --crit: #DC655F;
+
+  --font-display: "Newsreader", ui-serif, Georgia, serif;
+  --font-body:    "Manrope", system-ui, -apple-system, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* -----------------------------------------------------------------------------
+   CATEGORY PALETTE — Wayfare only. Seven colours, converted oklch → sRGB with
+   no gamut clipping. These are LABELS, not states, and are never interactive:
+   they must never be confused with --accent.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --cat-flight:  #E8605B;  /* oklch(66% 0.17  25) */
+  --cat-gym:     #5894D0;  /* oklch(65% 0.11 250) */
+  --cat-food:    #E28D4F;  /* oklch(72% 0.13  55) */
+  --cat-night:   #A272D4;  /* oklch(64% 0.15 305) */
+  --cat-explore: #5DAD70;  /* oklch(68% 0.12 150) */
+  --cat-relax:   #63B5B4;  /* oklch(72% 0.08 195) */
+  --cat-shop:    #D887AE;  /* oklch(72% 0.11 350) */
+}
+
+/* -----------------------------------------------------------------------------
+   TERMINAL EXTENSION — Wayfare Dark only. Promoted 2026-08-28.
+
+   The terminal binds Wayfare Dark to sixteen ANSI slots. Thirteen re-use tokens
+   that already exist; three had no value anywhere in this system, because ANSI
+   carries bright variants and this palette does not. They live here so there is
+   one canonical value instead of a hex stranded in a dotfile.
+
+   These are NOT "light variants of the category colours". The categories are
+   flat labels with no hover state, and minting a --cat-*-light tier for all
+   seven would import a terminal constraint into the design language. They are
+   named for the role they serve, and carry their source in the comment.
+
+   THE EXTENSION RULE — apply the system's own --accent -> --accent-light
+   relationship (L +0.094, C -0.014, hue held) to the source colour's documented
+   oklch. Note it REDUCES chroma as it lightens; that is what stops the brights
+   going neon. Any further colour this system needs is derived the same way,
+   never picked by eye.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --term-bright-blue:    #7CB1E7;  /* <- --cat-gym    oklch(74.4% 0.096 250)   8.74:1 */
+  --term-bright-magenta: #BD92ED;  /* <- --cat-night  oklch(73.4% 0.136 305)   7.99:1 */
+  --term-bright-cyan:    #8FD0CF;  /* <- --cat-relax  oklch(81.4% 0.066 195)  11.37:1 */
+}
+
+/* -----------------------------------------------------------------------------
+   SHAPE NOTE
+   Field Notes Light uses --radius-flat (square). Wayfare Dark uses the 12/16/20
+   scale. This is the one structural value the themes genuinely disagree on, and
+   it is deliberate: rounded corners on a survey-sheet aesthetic read as soft,
+   square corners on iOS read as un-native. Both are correct in place. Style
+   against --radius-card below rather than picking a literal.
+   -------------------------------------------------------------------------- */
+
+:root                  { --radius-card: var(--radius-flat); }
+[data-theme="wayfare"] { --radius-card: var(--radius-sm); }
+
+/* ---- card chrome ---- */
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; padding: var(--space-7);
+    background: var(--surface); color: var(--ink);
+    font-family: var(--font-body); font-size: var(--step-0);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--wash-strong); }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: var(--step--2);
+    text-transform: uppercase; letter-spacing: var(--track-eyebrow);
+    color: var(--muted-2); margin: 0 0 var(--space-3);
+  }
+  h1 {
+    font-family: var(--font-display); font-size: var(--step-3);
+    letter-spacing: var(--track-display); line-height: var(--leading-tight);
+    font-weight: 500; margin: 0 0 var(--space-3);
+  }
+  h2 {
+    font-family: var(--font-display); font-size: var(--step-2);
+    letter-spacing: var(--track-display); line-height: var(--leading-head);
+    font-weight: 500; margin: var(--space-7) 0 var(--space-4);
+  }
+  .lede { font-size: var(--step-1); color: var(--muted); max-width: var(--measure); margin: 0 0 var(--space-6); }
+  p { max-width: var(--measure); }
+  .label {
+    font-family: var(--font-mono); font-size: var(--step--2);
+    text-transform: uppercase; letter-spacing: var(--track-label);
+    color: var(--muted-2);
+  }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  /* token names must not break across lines mid-identifier */
+  code.mono { white-space: nowrap; }
+  .rule { border: 0; border-top: 1px solid var(--hairline); margin: var(--space-6) 0; }
+  a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { color: var(--accent-light); background: var(--wash); }
+  .note {
+    border-left: 2px solid var(--accent); background: var(--surface-sunk);
+    padding: var(--space-4) var(--space-5); margin: var(--space-5) 0;
+    max-width: var(--measure); font-size: var(--step--1); color: var(--muted);
+  }
+  .note strong { color: var(--ink); }
+  .grade {
+    font-family: var(--font-mono); font-size: var(--step--2);
+    letter-spacing: var(--track-label); padding: 2px 6px;
+    border: 1px solid var(--hairline); color: var(--muted-2);
+  }
+
+    .chips { display: flex; gap: var(--space-4); flex-wrap: wrap; margin: var(--space-6) 0; }
+    .chip2 { border: 1px solid var(--hairline); padding: var(--space-4) var(--space-5); min-width: 200px; }
+    .bar { height: 6px; margin-bottom: var(--space-4); }
+    .nm { font-family: var(--font-mono); font-size: var(--step--1); }
+    .rr { font-family: var(--font-mono); font-size: var(--step--2); font-variant-numeric: tabular-nums; color: var(--muted-2); }
+    .live { display: inline-flex; align-items: center; gap: var(--space-2); }
+    .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); animation: p 2s ease-in-out infinite; }
+    @keyframes p { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+    @media (prefers-reduced-motion: reduce) { .pulse { animation: none } }
+  
+</style></head><body>
+
+    <p class="eyebrow">Field Notes Light</p>
+    <h1>Semantic colour</h1>
+    <p class="lede">Held separate from the accent thread on purpose. These say what a thing <em>is</em>; the accent says what you can <em>do</em>.</p>
+    <div class="chips">
+      
+        <div class="chip2">
+          <div class="bar" style="background: var(--ok)"></div>
+          <div class="nm">--ok</div>
+          <div class="rr">#2D6A4F · 5.98:1 AA</div>
+          <div class="rr" style="color:var(--muted)">success</div>
+        </div>
+        <div class="chip2">
+          <div class="bar" style="background: var(--warn)"></div>
+          <div class="nm">--warn</div>
+          <div class="rr">#8A5A1E · 5.52:1 AA</div>
+          <div class="rr" style="color:var(--muted)">warning</div>
+        </div>
+        <div class="chip2">
+          <div class="bar" style="background: var(--crit)"></div>
+          <div class="nm">--crit</div>
+          <div class="rr">#A32E28 · 6.60:1 AA</div>
+          <div class="rr" style="color:var(--muted)">critical</div>
+        </div>
+    </div>
+    <div class="note"><strong><code class="mono">--ok</code> is #2D6A4F; <code class="mono">--accent</code> is #204E39.</strong>
+      Two different greens, deliberately. Collapsing them to one value is the single change that would break this theme's logic.</div>
+    <hr class="rule">
+    <p class="label">Status motion</p>
+    <p style="font-size: var(--step--1); color: var(--muted)">
+      <span class="live"><span class="pulse"></span> <span class="mono" style="font-size:var(--step--2); letter-spacing:var(--track-label); text-transform:uppercase">live</span></span>
+      — the page's one always-moving element wears <code class="mono">--ok</code>, never <code class="mono">--accent</code>. "Live" is a status, not a control. Respects <code class="mono">prefers-reduced-motion</code>.</p>
+  
+</body></html>

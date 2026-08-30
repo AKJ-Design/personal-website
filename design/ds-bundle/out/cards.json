@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Palette",
+    "path": "colour/palette.html",
+    "group": "Colour",
+    "subtitle": "9 tokens, measured against #FAF7F2"
+  },
+  {
+    "name": "The accent thread",
+    "path": "colour/accent-thread.html",
+    "group": "Colour",
+    "subtitle": "the one rule — accent does all interactive work"
+  },
+  {
+    "name": "Semantic colour",
+    "path": "colour/semantic.html",
+    "group": "Colour",
+    "subtitle": "ok / warn / crit — not the accent"
+  },
+  {
+    "name": "Scale",
+    "path": "type/scale.html",
+    "group": "Type",
+    "subtitle": "1.185 ratio · 11–48px"
+  },
+  {
+    "name": "Everything factual is mono",
+    "path": "type/factual-mono.html",
+    "group": "Type",
+    "subtitle": "tabular-nums wherever digits stack"
+  },
+  {
+    "name": "Spacing",
+    "path": "spine/spacing.html",
+    "group": "Spine",
+    "subtitle": "4px base · 4–64"
+  },
+  {
+    "name": "Elevation",
+    "path": "spine/elevation.html",
+    "group": "Spine",
+    "subtitle": "scoped, not ambient — index cards only"
+  },
+  {
+    "name": "Controls",
+    "path": "components/controls.html",
+    "group": "Components",
+    "subtitle": "buttons, fields, focus, selection"
+  },
+  {
+    "name": "Load-bearing values",
+    "path": "rules/load-bearing.html",
+    "group": "Rules",
+    "subtitle": "the constraints that are not cosmetic"
+  }
+]
