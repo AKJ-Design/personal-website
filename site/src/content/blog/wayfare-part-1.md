@@ -91,9 +91,18 @@ It presented me with a few options and the readout on each: HTML artifact, Excel
 
 ## iPhones hate HTML
 
-<figure class="shot">
-  <a href="/images/wayfare/html-itinerary.jpg" title="tap to enlarge"><img src="/images/wayfare/html-itinerary.jpg" alt="Claude delivering the Bangkok itinerary as an HTML file — day pills to flip between the eight days, colour-tagged categories, and a note field on every card" width="1200" height="823" loading="lazy" /></a>
-  <figcaption>Screenshot — the itinerary, delivered as an HTML file</figcaption>
+<figure class="replay">
+<div class="rp dl">
+<div class="dl-whip">
+<p>Here's your interactive itinerary. A few things about how it works:</p>
+<p>Tap the day pills along the top to flip between the 8 days. Each event is color-tagged by category, and every card has a small note field you can type into directly.</p>
+<p>What's locked in: your flights, the transfers, the breakfast → gym → pool → lunch rhythm, the Saturday Chatuchak slot, club nights on 1–2 Aug, and Muay Thai at Rajadamnern on 4 Aug.</p>
+<p>Just tell me what to adjust — add a booking, move an event, swap a day's plan — and I'll update the file directly.</p>
+</div>
+<div class="dl-card" aria-hidden="true"><span class="dl-ico">&lt;/&gt;</span><span><span class="dl-name">Bangkok itinerary</span><span class="dl-kind">Code · HTML</span></span><span class="dl-btn">Download and open</span></div>
+<div class="dl-phone"><img src="/images/wayfare/itinerary-open.jpg" alt="The itinerary file open: day pills across the top, colour-tagged cards for the arrival day's flights, transfer and dinner, each with its own note field" width="720" height="1620" loading="lazy" /></div>
+</div>
+<figcaption>Replay — delivered as a file, then opened</figcaption>
 </figure>
 
 There I had it, an interactive, visually appealing, mobile friendly and usable itinerary that presented as a webpage. It had colour coded activities, tabs for each day, a notes section to type in booking references or other info and important facts like walking distance from my hotel and what to wear (some places had a dress code). But there was one annoying issue: iPhones don't like HTML files. Nothing built into iOS would open my itinerary — Safari on my Mac rendered it happily, Safari on my iPhone wouldn't touch it. I ended up installing Microsoft Edge, one of the few iPhone browsers that would open the file at all.

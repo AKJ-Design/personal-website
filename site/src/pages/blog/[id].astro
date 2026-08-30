@@ -16,8 +16,10 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { publishedPosts, postMeta } from '../../lib/posts';
-/* The Bangkok chat replay's generated timeline (see scripts/generate-replay.mjs) */
+/* The Bangkok chat replay's generated timeline (see scripts/generate-replay.mjs)
+   and the hand-authored delivered-then-opened figure that shares its stage */
 import '../../styles/replay.css';
+import '../../styles/delivery.css';
 
 export async function getStaticPaths() {
   const posts = await publishedPosts();
