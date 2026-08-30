@@ -14,7 +14,7 @@
  * Plate values are claims — every one must be literally true. The shipped
  * count is rendered from the same arrays the home index renders, never typed.
  */
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import photo from '../assets/alex-480.jpg';
 import { PROJECTS } from '../data/projects';
@@ -34,13 +34,18 @@ const RECEIPTS = [
 
 /* Person JSON-LD, build-time (build plan §2.5): full name, photo, sameAs →
    GitHub + LinkedIn only. The App Store joins if/when Wayfare leaves
-   TestFlight. Same constants as the footer, so the two cannot drift. */
+   TestFlight. Same constants as the footer, so the two cannot drift.
+
+   The photo goes through getImage(), not photo.src: the compile-time image
+   service only emits the optimized variants, so the original jpg's URL would
+   404. getImage() emits a real asset and returns its built URL. */
+const ldPhoto = await getImage({ src: photo, width: 480, height: 480, format: 'jpeg' });
 const personLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Alex Young',
   url: new URL('/about/', Astro.site).href,
-  image: new URL(photo.src, Astro.site).href,
+  image: new URL(ldPhoto.src, Astro.site).href,
   sameAs: [GITHUB_URL, LINKEDIN_URL],
 };
 ---
