@@ -42,7 +42,37 @@ After discussing some basics and getting settled on key topics across gym, eatin
 
 Ok, that's done right? By this stage I had used Claude to search across forums, blog posts, TripAdvisor and more, across a range of trip categories, and had landed on a curated and detailed itinerary… So, tick that off the list?
 
-<figure class="shot"><figcaption>Screenshot — the itinerary taking shape in chat</figcaption></figure>
+<figure class="replay">
+<div class="rp">
+<div class="rp-cam">
+<div class="rp-col">
+<div class="rp-blk rp-b0"><div class="rp-line rp-l0">Perfect — that's a really solid Bangkok week. Train hard,</div><div class="rp-line rp-l1">eat well, one big Muay Thai night, a couple of clubs, and</div><div class="rp-line rp-l2">some exploring mixed in. Very doable.<span class="rp-cur" aria-hidden="true"><i></i></span></div></div>
+<div class="rp-blk rp-b1"><div class="rp-line rp-l0">Let me pull together the best options for each piece.<span class="rp-cur" aria-hidden="true"><i></i></span></div></div>
+<div class="rp-blk rp-b2"><span class="rp-pill"><span class="rp-dot"></span>Searched the web<span class="rp-shimmer"></span></span></div>
+<div class="rp-blk rp-b3"><div class="rp-line rp-l0">Great — here's a proper Bangkok week framework built</div><div class="rp-line rp-l1">around your priorities.<span class="rp-cur" aria-hidden="true"><i></i></span></div></div>
+<div class="rp-blk rp-b4"></div>
+<div class="rp-blk rp-b5">Your Bangkok Week — July 2026</div>
+<div class="rp-blk rp-b6"><span class="rp-hdot"></span>Muay Thai Night</div>
+<div class="rp-blk rp-b7"><div class="rp-line rp-l0"><strong>Rajadamnern Stadium</strong> is your pick.</div></div>
+<div class="rp-blk rp-b8"><span class="rp-hdot"></span>Street Food &amp; Night Markets</div>
+<div class="rp-blk rp-b9"><div class="rp-line rp-l0"><strong>SW1 Market</strong> — right at the entrance of Sukhumvit Soi 12,</div><div class="rp-line rp-l1">with over 120 stalls of authentic Thai street food,</div><div class="rp-line rp-l2">vintage fashion, and local drinks. Your go-to for a</div><div class="rp-line rp-l3">casual evening.<span class="rp-chip">Gurulist</span></div></div>
+<div class="rp-blk rp-b10"><div class="rp-line rp-l0"><strong>Jodd Fairs Ratchada</strong> — the big one. One MRT stop away,</div><div class="rp-line rp-l1">massive, packed with locals, and widely considered the</div><div class="rp-line rp-l2">best street food night market in Bangkok right now. Go</div><div class="rp-line rp-l3">hungry.</div></div>
+<div class="rp-blk rp-b11"><div class="rp-line rp-l0"><strong>Yaowarat (Chinatown)</strong> — for a proper evening. One of the</div><div class="rp-line rp-l1">world's great street food strips. Grab the MRT to Hua</div><div class="rp-line rp-l2">Lamphong, and eat everything.</div></div>
+<div class="rp-blk rp-b12"><span class="rp-hdot"></span>Exploring (lighter days / mornings)</div>
+<div class="rp-blk rp-b13"><div class="rp-line rp-l0">Since you've done some temples already — a few things</div><div class="rp-line rp-l1">worth considering:</div></div>
+<div class="rp-blk rp-b14"><div class="rp-line rp-l0"><span class="rp-bdot" aria-hidden="true"></span><strong>Chatuchak Weekend Market</strong> (if your dates include a</div><div class="rp-line rp-l1">Sat/Sun) — enormous, fun, great for a browse and cheap</div><div class="rp-line rp-l2">Thai food</div></div>
+<div class="rp-blk rp-b15"><div class="rp-line rp-l0"><span class="rp-bdot" aria-hidden="true"></span><strong>Lumpini Park</strong> morning walk — popular with locals, a good</div><div class="rp-line rp-l1">wind-down from a training session</div></div>
+<div class="rp-blk rp-b16"></div>
+<div class="rp-blk rp-b17"><div class="rp-line rp-l0">Want me to pull this into an actual day-by-day itinerary</div><div class="rp-line rp-l1">for the week of 23 July? I can map it around gym sessions,</div><div class="rp-line rp-l2">the Muay Thai fight schedule, and club nights.<span class="rp-cur" aria-hidden="true"><i></i></span></div></div>
+</div>
+</div>
+<div class="rp-fade-top" aria-hidden="true"></div>
+<div class="rp-fade-bot" aria-hidden="true"></div>
+<div class="rp-hdr">Claude<span class="rp-hdr-rule"></span></div>
+<div class="rp-thread">Bangkok week — planning thread</div>
+</div>
+<figcaption>Replay — the itinerary taking shape in chat</figcaption>
+</figure>
 
 Well in past years using AI, that is probably where I would have left it. My last trip for example (four countries, five cities, a scuba diving certification and a trip to the North Korean border), I transferred my plan into an Excel sheet so I could keep track of everything and off I went.
 
