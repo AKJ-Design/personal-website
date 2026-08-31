@@ -1,12 +1,12 @@
 # site/ — the Astro build
 
-The code. `../design/`, `../content/` and `../research/` are the receipts it was built from;
-the operating notes and build-phase status live in [`../README.md`](../README.md).
+The code. `../design/` and `../content/` are the receipts it was built from; the operating
+notes and build-phase status live in [`../README.md`](../README.md).
 
 ```bash
 npm install
 npm run dev      # http://localhost:4321 — NOTE: Astro 7 backgrounds this
-npm run build    # → dist/client/
+npm run build    # scripts/generate-og.mjs first, then astro build → dist/client/
 ```
 
 `astro dev` returns immediately and leaves the server running in the background. Use
@@ -17,9 +17,18 @@ npm run build    # → dist/client/
 ```
 src/styles/tokens.css     verbatim copy of ../design/tokens.css — never edit here
 src/styles/base.css       the mocks' base layer + the font bridge (see below)
-src/layouts/Base.astro    html shell: head, canonical, fonts, header + footer
-src/components/           Header, Footer
-src/assets/               images that get optimised at build (photo derivatives)
+src/styles/replay.css     GENERATED chat-replay timeline — edit scripts/generate-replay.mjs, re-run, copy over
+src/styles/delivery.css   the delivered-then-opened figure — small, hand-maintained
+src/layouts/Base.astro    html shell: head, canonical, OG/twitter meta, fonts, header + footer
+src/components/           Header, Footer, Card, PostCard, Strip
+src/content.config.ts     blog collection schema — filenames are the frozen slugs
+src/content/blog/         one Markdown file per post (write-a-post recipe in ../README.md)
+src/lib/posts.ts          the one source for post listings: home, /blog/, About plate, RSS, OG
+src/data/                 projects array + the social URLs (footer and Person sameAs share these)
+src/pages/blog/           post layout + writing index; rss.xml.ts beside them in pages/
+src/assets/               images that get optimised at build (photo derivatives, card visuals)
+public/images/            post screenshots and diagrams, served as-is (pre-sized by hand)
+public/og/                GENERATED at build by scripts/generate-og.mjs — gitignored
 ```
 
 ## Three things that are not obvious
