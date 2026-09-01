@@ -7,8 +7,12 @@
  * "Sticky is a rule" (decisions.md, 2026-08-23): the header row stays sticky on
  * every page, so this component is used by every layout without exception.
  */
-import { Image } from 'astro:assets';
-import avatar from '../assets/alex-160.jpg';
+/* Plain <img> off ESM imports, NOT <Image> — see the note in data/projects.ts.
+   The header ships on `/`, which is the site's one on-demand route, and astro:assets
+   only pre-optimises images it can see at build time. The two files below are
+   already the exact sizes they render at, so there is nothing left to optimise. */
+import avatar1x from '../assets/alex-32.webp';
+import avatar2x from '../assets/alex-64.webp';
 
 /* Anchors are absolute, not bare fragments: the same header ships on /about and
    /blog, where "#projects" would resolve to nothing. */
@@ -24,7 +28,14 @@ const { pathname } = Astro.url;
 <header class="site-head">
   <div class="page head-row">
     <a class="brand" href="/">
-      <Image class="avatar" src={avatar} width={32} height={32} alt="" densities={[1, 2]} />
+      <img
+        class="avatar"
+        src={avatar1x.src}
+        srcset={`${avatar1x.src} 1x, ${avatar2x.src} 2x`}
+        width="32"
+        height="32"
+        alt=""
+      />
       <span class="wordmark">Alex Young</span>
     </a>
     <nav aria-label="Primary">

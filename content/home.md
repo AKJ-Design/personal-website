@@ -16,6 +16,28 @@ plan's rule: the mocks use this copy verbatim.*
 store named) is literally true of TestFlight distribution — wording stands. /about now says
 TestFlight explicitly.*
 
+## The live strip (copy settled 2026-09-01, step 7)
+
+The four labels, left to right, and the stamp:
+
+> **Last workout** · **Services** · **Off-site backup** · **Weather**
+>
+> *pushed from my laptop · cached 07:00*
+
+*The values themselves are never written here — they arrive from the hourly snapshot and change
+every hour. Only the labels and the stamp are copy.*
+
+*The mock's stamp read "live from my own APIs", and it was retired rather than shortened. Three of
+the four values are mine; the weather is a public API, so the sentence stopped being literally
+true the moment the cell set was settled — and `decisions.md`'s rule for the About plate is the
+one that governs here too: every value on the page is a claim, and every claim must be literally
+true. What replaced it is true of all four, and says the more interesting thing anyway: these are
+pushed here from a laptop, not fetched on demand.*
+
+*Sleep was dropped from the row on the same day. It was in the mock, but Apple Health reaches the
+database through a manual file drop, so the figure would routinely have been days old under a
+stamp that implies hours.*
+
 ## Project one-liners (six cards, 2026-08-23; order = strongest first)
 
 - **Wayfare** — a native iOS/SwiftUI travel planner, built on my own Cloudflare Workers + D1 API.

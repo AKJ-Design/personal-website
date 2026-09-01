@@ -2,55 +2,46 @@
 /**
  * The live status strip — the signature element.
  *
- * STEP 4 STATE: build-time fallback values, exactly as in the mock. Nothing
- * here is live yet.
+ * STEP 7 STATE: fed from Workers KV. An hourly launchd job on the MacBook
+ * (home-lab/scripts/strip-snapshot.sh) pushes a snapshot; `/` is the site's one
+ * non-prerendered route and reads it server-side. Cloudflare never reaches into
+ * the tailnet — the perimeter rule in principles.md — so the data comes to it.
  *
- * STEP 7 will feed it from Workers KV: an hourly snapshot pushed from the
- * MacBook (never pulled — Cloudflare must not reach into the tailnet, per
- * principles.md's perimeter rule). At that point `/` becomes the only
- * non-prerendered route and these values become the *degrade* case:
+ * All the parsing, validation and degrade logic lives in lib/strip.ts. This file
+ * only draws. Given a StripView it cannot fail: the view always has four cells and
+ * a stamp, whatever state KV was in.
  *
- *   KV fresh          → render it, with its own cached_at as the stamp
- *   KV stale > 24 h   → render the last values, stamp says so
- *   KV empty/missing  → render exactly what is below
- *
- * Never an empty row, never an error (directions.md's degrade rule). That is
- * why the fallbacks live in the component rather than being fetched — there is
- * always something to draw.
+ * Zero client JS, as everywhere else. The pulsing dot is CSS, and it stops pulsing
+ * when the values stop being current — a moving dot over a two-day-old snapshot
+ * would be the page lying with animation.
  *
  * Deliberately NOT a floating card: the strip keeps the flat survey-sheet
  * treatment while the project cards float. If everything floats, nothing does.
  *
- * PRIVACY, when the real data arrives (build plan §2.3): values stay coarse
- * (sleep to 15 min, workout day-relative), delayed, and the service count is a
- * NUMBER, never a list — and the Prometheus query behind it must use an
- * explicit allow-list of service names (kept in the private build plan): the
- * published count covers the services VM only.
+ * PRIVACY (build plan §2.3): every value arrives already coarsened — the workout as
+ * a category and a day-relative age, services as a COUNT from an explicit
+ * allow-list of services-VM checks, weather at city resolution. Nothing here can
+ * make a value finer, because nothing finer is ever sent.
  */
+import type { StripView } from '../lib/strip';
 
-interface Cell {
-  key: string;
-  val: string;
+interface Props {
+  view: StripView;
 }
 
-const CELLS: Cell[] = [
-  { key: 'Sleep', val: '7 h 42 m' },
-  { key: 'Last workout', val: 'Pull · yesterday' },
-  { key: 'Services', val: '11 / 11 up' },
-  { key: 'Weather', val: '14 °C · clear' },
-];
-
-const stamp = 'live from my own APIs · cached 07:00';
+const { view } = Astro.props;
 ---
 
 <section class="strip" aria-label="Live status">
-  {CELLS.map(({ key, val }) => (
+  {view.cells.map(({ label, value }) => (
     <div class="cell">
-      <span class="key">{key}</span>
-      <span class="val">{val}</span>
+      <span class="key">{label}</span>
+      <span class="val">{value}</span>
     </div>
   ))}
-  <div class="stamp"><span class="live-dot"></span>{stamp}</div>
+  <div class="stamp">
+    <span class:list={['live-dot', view.state]}></span>{view.stamp}
+  </div>
 </section>
 
 <style>
@@ -99,15 +90,22 @@ const stamp = 'live from my own APIs · cached 07:00';
     background: var(--ok);
     margin-right: var(--space-2);
     vertical-align: 1px;
-    animation: pulse 2.4s ease-out infinite;
   }
+  /* Only the current state animates. A pulsing dot above a two-day-old snapshot
+     would be the page asserting "live" with motion while its own stamp says
+     otherwise — and motion is the more persuasive of the two. --warn carries the
+     degraded states, so the row reads as stale at a glance and on close reading. */
+  .live-dot.fresh { animation: pulse 2.4s ease-out infinite; }
+  .live-dot.stale,
+  .live-dot.absent { background: var(--warn); }
+
   @keyframes pulse {
     0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 45%, transparent); }
     70%  { box-shadow: 0 0 0 7px transparent; }
     100% { box-shadow: 0 0 0 0 transparent; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .live-dot { animation: none; }
+    .live-dot.fresh { animation: none; }
   }
 
   @media (max-width: 720px) {

@@ -15,6 +15,24 @@
 		"directory": "./dist",
 		"binding": "ASSETS"
 	},
+
+	// The live strip (step 7). The ONLY binding this site has, and the only reason
+	// `/` is server-rendered — every other route is a static file.
+	//
+	// Read-only from the Worker's side. Nothing in this codebase writes to it: the
+	// snapshot is PUSHED hourly from the MacBook by home-lab/scripts/strip-snapshot.sh,
+	// because a Worker that could fetch these values would have to be able to reach
+	// into the tailnet, which is the thing the whole design refuses to do.
+	//
+	// If `wrangler deploy --dry-run` ever lists a binding other than this and ASSETS,
+	// an adapter default has been re-enabled — see astro.config.mjs and site/README.md.
+	"kv_namespaces": [
+		{
+			"binding": "STRIP",
+			"id": "1224900da14a40c2bc12187d1a6e680c"
+		}
+	],
+
 	"observability": {
 		"enabled": true
 	}

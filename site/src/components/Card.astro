@@ -9,7 +9,6 @@
  * live strip and article pages stay flat by design — if everything floats,
  * nothing does.
  */
-import { Image } from 'astro:assets';
 import type { Project } from '../data/projects';
 
 interface Props {
@@ -30,15 +29,17 @@ const { idx, kind, title, blurb, hook, meta, href, visual, alt } = project;
         <p class="meta">{meta}</p>
       </div>
       {/* eager + high priority: the flagship shot is above the fold at desktop
-          and is the page's LCP candidate. Astro defaults every Image to
-          loading="lazy", which on an above-the-fold image delays the very
-          paint Lighthouse measures — and step 9 wants >= 95 on a phone
-          profile. Every other card visual below stays lazy, correctly. */}
-      <Image
+          and is the page's LCP candidate. A lazy above-the-fold image delays the
+          very paint Lighthouse measures — and step 9 wants >= 95 on a phone
+          profile. Every other card visual below is explicitly lazy, correctly.
+
+          width/height are the SLOT, not the file: the source is 2x so it stays
+          sharp on a retina screen and when the card goes full-width on a phone. */}
+      <img
         class="shot"
-        src={visual}
-        width={240}
-        height={300}
+        src={visual.src}
+        width="240"
+        height="300"
         alt={alt}
         loading="eager"
         fetchpriority="high"
@@ -51,14 +52,14 @@ const { idx, kind, title, blurb, hook, meta, href, visual, alt } = project;
       <span class="idx">{idx}</span>
       <h3>{title}</h3>
       <p>{blurb}</p>
-      <Image class="vis" src={visual} alt={alt} />
+      <img class="vis" src={visual.src} width={visual.width} height={visual.height} alt={alt} loading="lazy" />
       <p class="meta">{meta}</p>
     </>
   )}
 
   {kind === 'compact' && (
     <>
-      <Image class="icon" src={visual} width={56} height={56} alt={alt} />
+      <img class="icon" src={visual.src} width="56" height="56" alt={alt} loading="lazy" />
       <span class="idx">{idx}</span>
       <div>
         <h3>{title}</h3>

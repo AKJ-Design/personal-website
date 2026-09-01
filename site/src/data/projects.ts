@@ -18,12 +18,31 @@
  */
 import type { ImageMetadata } from 'astro';
 
+/* WHY THESE ARE PRE-SIZED WEBP AND RENDERED WITH A PLAIN <img>
+ *
+ * Home is the site's one on-demand route (step 7, so the strip can read KV), and
+ * astro:assets only pre-generates derivatives for routes it prerenders. Left as
+ * <Image>, every visual on the front page resolved to `/_image?href=...` at request
+ * time — a Worker invocation per image, no immutable caching, and with
+ * `imageService: 'compile'` the passthrough endpoint ignores the resize and serves
+ * the original anyway (measured 2026-09-01: a 240px slot served a 640px JPEG).
+ *
+ * So the resizing moved to author time. These files are already the size they are
+ * displayed at, imported as ESM so they still get content-hashed filenames and the
+ * immutable Cache-Control that `_headers` puts on /_astro/*, and rendered as plain
+ * <img> so no image service is involved on any route. The flagship shot got smaller
+ * doing it: 78 KB JPEG -> 16 KB WebP, at twice the pixel density.
+ *
+ * The originals stay in ../../design/mocks/assets/ and design/photo/, which is the
+ * same receipt-vs-build-copy split as tokens.css. Re-derive with sharp if a slot
+ * size ever changes — and change the size HERE, not with a CSS scale.
+ */
 import brain from '../assets/cards/brain.svg';
 import fitness from '../assets/cards/fitness.svg';
 import homelab from '../assets/cards/homelab.svg';
 import thisSite from '../assets/cards/this-site.svg';
-import quietnineIcon from '../assets/cards/quietnine-icon.png';
-import wayfareShot from '../assets/cards/wayfare-today.jpg';
+import quietnineIcon from '../assets/cards/quietnine-icon.webp';
+import wayfareShot from '../assets/cards/wayfare-today.webp';
 
 export type CardKind = 'flagship' | 'mid' | 'compact';
 

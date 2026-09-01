@@ -11,10 +11,9 @@
  * full name does the entity-consistency work in the wordmark, the <title> and
  * the Person structured data instead.
  *
- * Step 7 turns this into the site's ONE non-prerendered route
- * (`export const prerender = false`) so the strip can read KV. Everything else
- * stays a static asset. Nothing on this page needs client JS either way — the
- * pulsing dot is CSS.
+ * STEP 7: this is the site's ONE non-prerendered route, so the strip can read its
+ * snapshot out of KV at request time. Everything else on the site stays a static
+ * asset. Nothing here needs client JS either way — the pulsing dot is CSS.
  */
 import Base from '../layouts/Base.astro';
 import Strip from '../components/Strip.astro';
@@ -22,6 +21,38 @@ import Card from '../components/Card.astro';
 import PostCard from '../components/PostCard.astro';
 import { PROJECTS } from '../data/projects';
 import { publishedPosts, postMeta } from '../lib/posts';
+import { stripView } from '../lib/strip';
+
+/* Bindings come from `cloudflare:workers`, NOT `Astro.locals.runtime.env`, which
+   Astro 6 removed — its getter now throws, telling you to import this instead.
+   Worth knowing how that presented: the throw landed in the catch below and the
+   page degraded to "snapshot unavailable", looking exactly like an empty KV. A
+   clean degrade path will hide a bug from you if you let it, which is why the
+   catch logs (see below) rather than only swallowing.
+
+   `env` is typed by worker-configuration.d.ts — regenerate with
+   `npm run generate-types` after changing a binding in wrangler.jsonc. */
+import { env } from 'cloudflare:workers';
+
+/* The one route that runs on request rather than at build. Everything below the
+   strip is identical on every request; this exists solely so four lines of the
+   page can be current. That trade is the whole of build plan §2.3. */
+export const prerender = false;
+
+/* KV can be absent in ordinary ways — the key never written, the read failing
+   mid-flight — and none of them is a reason to 500 the front door. stripView()
+   turns null into a rendered row.
+
+   The console.error matters: observability is on in wrangler.jsonc, so a read
+   that starts failing leaves a trace in the Worker logs instead of quietly
+   presenting as "the laptop must be asleep". */
+let snapshot: string | null = null;
+try {
+  snapshot = (await env.STRIP.get('strip')) ?? null;
+} catch (err) {
+  console.error('strip: KV read failed', err);
+}
+const strip = stripView(snapshot);
 
 /* Counts are rendered, not typed, so the labels cannot drift from the source.
    decisions.md: "plate values are claims — every one must be literally true."
@@ -47,7 +78,7 @@ const postCount = String(POSTS.length).padStart(2, '0');
     </p>
   </section>
 
-  <Strip />
+  <Strip view={strip} />
 
   <section class="projects" id="projects">
     <h2 class="section-label">Projects — {projectCount}</h2>

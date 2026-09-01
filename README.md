@@ -91,10 +91,19 @@ Plan: `personal-plans/website-build-plan.md` (rev 1, accepted 2026-08-27). Code 
       (`scripts/generate-replay.mjs` → `styles/replay.css`, one 28.5s master timeline) and the
       delivered-then-opened file (`styles/delivery.css`, 20s). Zero script tags throughout;
       reduced motion gets each replay's finished state as a static figure
-- [ ] **7 — Strip, live** (next): KV namespace, snapshot script, launchd job, home un-prerendered
+- [x] **7 — Strip, live** (2026-09-01). KV namespace `STRIP` bound to the Worker; `/` is now
+      the site's **one** non-prerendered route and reads the snapshot per request. The snapshot is
+      **pushed** hourly from the MacBook by `home-lab/scripts/strip-snapshot.sh` under launchd —
+      Cloudflare never reaches into the tailnet. **Sleep was dropped from the strip**, which is
+      what closed the `fitness.db` gate: the health metrics reach the database through a manual
+      file drop and cannot be automated, while the workout log arrives over an API and syncs
+      unattended — so the row is now **Last workout · Services · Off-site backup · Weather**. The stamp was reworded — "live from my own APIs"
+      stopped being true once weather (a public API) joined the row
+- [ ] **8 — Custom domain** (next): route the Worker to `alexyoung.com.au`, `www` redirect, HSTS,
+      and flip `robots.txt`
 
-Steps 5–6 (About, blog) continue the Claude-driven stretch; 7–10 (live strip, custom
-domain, launch check, cross-post) are paired. Full sequence in the build plan §3.
+Steps 5–7 ran as a Claude-driven stretch; 8–10 (custom domain, launch check, cross-post) are
+paired. Full sequence in the build plan §3.
 
 > **Dev-server gotcha, cost an hour on 2026-08-28.** Astro's dev `/_image` endpoint hangs
 > intermittently, which makes the flagship card *appear* to overflow the page and its image
@@ -156,12 +165,20 @@ Found 2026-08-28 in the pre-step-3 review. Each names the step it must close by.
   consistency exists to prevent. The file says what to replace it with. **The site cannot be
   indexed until this is flipped** — check the preview host from the outside too, not just the
   real domain.
-- **`fitness.db` sync — by step 7.** Latest row across workouts / health / nutrition is
-  **2026-08-23** (checked 2026-08-28) — five days behind. Better than the 18 days build plan §6
-  flagged, but the strip's "cached HH:MM" stamp implies hours. Fix the pipeline before step 7.
-- **Service-count allow-list — by step 7.** "11 / 11 up" must come from an explicit allow-list of
-  service names, never a Prometheus target count — the published number covers the services VM
-  only. The allow-list itself lives in the private build plan.
+- **`fitness.db` sync — closed 2026-09-01 (step 7), by removing the dependency.** The pipeline
+  was never fixed and the gate was closed a different way: the strip no longer publishes anything
+  that needs it. The split that made this possible is worth keeping in mind — **the workout log
+  syncs over an API** (a key from the Keychain, no iCloud in the path, so the snapshot job
+  re-syncs it every hour), while **the health metrics arrive as a file drop** from the phone and
+  cannot be automated without solving a macOS permissions problem. Sleep was the only strip value
+  on the blocked side, so it went. Ingestion stays ritual-coupled by design.
+- **Service-count allow-list — closed 2026-09-01 (step 7).** The **allow-list is the probe list**:
+  `strip-snapshot.sh` holds an array of six named services-VM checks and counts the successes.
+  There is no query whose result set could widen, so nothing on the node box can be counted by
+  accident and adding an exporter somewhere cannot change the published number — changing it takes
+  a deliberate edit to that array. The mock's "11 / 11" was aspirational; the honest count is 6.
+  "Up" means an HTTP response (a 302 to a login page is a healthy service saying no); a TLS or
+  connect failure is not, which is what caught two genuinely-down services on 2026-09-01.
 - **`design/tokens.json:2` — closed 2026-08-30.** The `$schema` stray-`j` domain typo
   (`alexjyoung` → `alexyoung`) fixed with Alex's approval in the going-public pass; no other
   token value touched.
@@ -178,8 +195,10 @@ Found 2026-08-28 in the pre-step-3 review. Each names the step it must close by.
 - Space Grotesk and JetBrains Mono are installed locally (incl. variable TTFs), so the mocks
   rendered in the real faces rather than fallbacks. Only weights 400/600/700 are used. No local
   `fonttools`/`woff2` — Astro's Fonts API does the subsetting and self-hosting instead.
-- Wrangler 4.127 authenticated to the right account; `workers (write)` present, **no explicit KV
-  scope** — expect a re-auth at step 7. No `gh` CLI installed.
+- Wrangler 4.127 authenticated to the right account; `workers (write)` present. No `gh` CLI
+  installed. *(Corrected 2026-09-01: this said "no explicit KV scope — expect a re-auth at step 7".
+  Wrong — `wrangler whoami` lists `workers_kv (write)`, and step 7 needed no re-auth. The
+  unattended snapshot job does not use this session anyway; it carries its own scoped API token.)*
 
 ## Operating notes — DNS and email
 
@@ -248,6 +267,48 @@ npx wrangler deploy --dry-run
   a *new* token, not by re-picking from the dropdown, which still lists dead ones. A real build
   error takes 30 s+ and names a file. This is a fourth cause on top of the build plan §4 list of
   three (build error, missing binding, bad content frontmatter).
+### The live strip — operating it
+
+The values are **pushed**, never pulled: `home-lab/scripts/strip-snapshot.sh` runs hourly under
+launchd on the MacBook and writes JSON to KV key `strip`; `/` reads it per request. That direction
+is the whole design — a Worker that could fetch these would have to be able to reach into the
+tailnet.
+
+```bash
+~/Documents/home-lab/scripts/strip-snapshot.sh --dry-run
+```
+
+Prints the payload and writes nothing. It also runs **without the API token**, so the whole
+value-gathering path is debuggable without holding write access to the live site.
+
+```bash
+launchctl kickstart -p gui/$UID/com.akjdesign.strip-snapshot   # force a run now
+tail -f ~/.local/share/strip-snapshot/snapshot.log             # what it did
+```
+
+- **What the four cells are, and what each degrades to.** Fresh under 24 h → the values with a
+  `cached HH:MM` stamp. Over 24 h → the same values, the stamp says how many days, and the dot
+  turns amber and stops pulsing. No snapshot at all (or an unparseable one) → **em dashes and
+  "snapshot unavailable"**, never the mock's numbers: inventing a service count while the pipeline
+  is down would be precisely the untrue claim `design/decisions.md` forbids.
+- **The page is its own monitor.** A laptop that is asleep, off the network, or has a broken job
+  says so on the front page, in public. The Kuma heartbeat is the backstop, not the signal —
+  which is just as well, because the Mac's Kuma pushes are currently unreliable (see below).
+- **Nothing fine-grained ever leaves the laptop.** The snapshot carries *rendered strings*, so the
+  coarsening happens in the only process that sees the real data — the Worker cannot render
+  something more precise than it was handed, because it never receives it. A workout's routine
+  name becomes a category; its date becomes "yesterday"; the service list becomes a count; the
+  weather is Brisbane at city resolution, never geolocated.
+- **Rotating the token** (build plan §4's last item): issue a new one at Cloudflare → Manage API
+  tokens with the single permission *Workers KV Storage: Edit*, then
+  `security add-generic-password -U -s strip-snapshot-cf-token -a alex -w`, then kickstart the job
+  and check the log. Nothing needs redeploying — the Worker only ever reads.
+- **If the strip is stuck on old values**, check in this order: the log above (did the job run?),
+  then `npx wrangler kv key get --binding STRIP --remote strip` from `site/`. **`--remote` is not
+  optional** — without it wrangler reads a local miniflare store, a different and empty namespace,
+  and the values look missing when they are fine. KV is eventually consistent; give a write a
+  minute before believing it failed.
+
 - **If headings render in the body typeface,** it is the font bridge in `site/src/styles/base.css`,
   not a failed download — Astro emits `@font-face` under a hashed family name, so `tokens.css`'s
   literal `"Space Grotesk"` matches nothing on its own. This fails silently, with no console error.
