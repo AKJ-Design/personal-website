@@ -73,6 +73,7 @@ const TIME = new Intl.DateTimeFormat('en-AU', {
   minute: '2-digit',
   hour12: false,
 });
+const DAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Brisbane' }); // YYYY-MM-DD
 
 function absent(): StripView {
   return {
@@ -127,13 +128,19 @@ export function stripView(raw: string | null | undefined, now: Date = new Date()
     };
   }
 
+  // A time alone reads as "today". Under the 24 h window the snapshot can also be
+  // from yesterday — seen the morning after step 7 shipped, when "cached 15:33" sat
+  // over a workout labelled "yesterday" that was by then two days old. The rendered
+  // strings freeze at push time, so the stamp has to carry the day when it matters.
+  const when = DAY.format(cachedAt) === DAY.format(now) ? '' : 'yesterday ';
+
   return {
     cells,
     // Reworded from the mock's "live from my own APIs", which stopped being literally
     // true when weather (a public API) joined the row. This says the thing that is
     // true of all four values, and happens to be the more interesting claim anyway:
     // they were pushed here, from a laptop, rather than fetched on demand.
-    stamp: `pushed from my laptop · cached ${TIME.format(cachedAt)}`,
+    stamp: `pushed from my laptop · cached ${when}${TIME.format(cachedAt)}`,
     state: 'fresh',
   };
 }
