@@ -8,6 +8,14 @@
  * shadow and turns the title accent, so the interactive cue stays green. The
  * live strip and article pages stay flat by design — if everything floats,
  * nothing does.
+ *
+ * LINKED VS NOT (2026-09-05, step 9). A card with no `href` renders as a <div>
+ * and every hover affordance is withheld — no lift, no pointer, no accent on
+ * the title. Only `a.card` gets them. Four of the six have nowhere to go until
+ * their write-ups exist, and a card that looks clickable but is not spends the
+ * accent thread on nothing (decisions.md, 2026-08-15: the thread is reserved
+ * for interaction). The card still floats at rest, because elevation here marks
+ * "this is an index entry", not "this is a link".
  */
 import type { Project } from '../data/projects';
 
@@ -16,9 +24,14 @@ interface Props {
 }
 const { project } = Astro.props;
 const { idx, kind, title, blurb, hook, meta, href, visual, alt } = project;
+
+/* Capitalised so Astro treats it as a tag name rather than an HTML literal. */
+const Tag = href ? 'a' : 'div';
 ---
 
-<a class:list={['card', kind]} href={href}>
+{/* Dynamic tag, not two copies of the markup: <a> when there is somewhere to
+    go, <div> when there is not. An undefined href simply omits the attribute. */}
+<Tag class:list={['card', kind]} href={href}>
   {kind === 'flagship' && (
     <>
       <div class="body">
@@ -68,7 +81,7 @@ const { idx, kind, title, blurb, hook, meta, href, visual, alt } = project;
       <span class="meta">{meta}</span>
     </>
   )}
-</a>
+</Tag>
 
 <style>
   .card {
@@ -80,10 +93,13 @@ const { idx, kind, title, blurb, hook, meta, href, visual, alt } = project;
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-1);
     padding: var(--space-5);
-    transition: box-shadow 0.15s ease;
   }
-  .card:hover { background: var(--surface-raised); box-shadow: var(--shadow-2); }
-  .card:hover h3 { color: var(--accent); }   /* the interactive cue stays green */
+  a.card { transition: box-shadow 0.15s ease; }
+  /* Hover affordances belong to LINKED cards only — see the note at the top.
+     A <div class="card"> keeps --shadow-1 and its ink title, and gets no
+     pointer, so nothing about it invites a click it cannot honour. */
+  a.card:hover { background: var(--surface-raised); box-shadow: var(--shadow-2); }
+  a.card:hover h3 { color: var(--accent); }   /* the interactive cue stays green */
 
   .card .idx {
     font-family: var(--font-mono);

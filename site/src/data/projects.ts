@@ -17,6 +17,7 @@
  * named or implied, here or in the homelab post.
  */
 import type { ImageMetadata } from 'astro';
+import { REPO_URL } from './social';
 
 /* WHY THESE ARE PRE-SIZED WEBP AND RENDERED WITH A PLAIN <img>
  *
@@ -55,7 +56,20 @@ export interface Project {
   /** Flagship only — the story hook under the blurb (mock rev 4). */
   hook?: string;
   meta: string;
-  href: string;
+  /**
+   * OPTIONAL, and its absence is the point (2026-09-05, step 9).
+   *
+   * Five of the six cards had `href: '#'` at launch, because every repo except
+   * this site's is private and the case studies are not written. A card with a
+   * dead link still floated, still lifted on hover and still turned its title
+   * `--accent` — and the accent thread is reserved for things you can actually
+   * interact with (decisions.md, 2026-08-15). So a card with nothing to point
+   * at renders as a <div>, not an <a>: no pointer, no lift, no green.
+   *
+   * Give a card an href the day its write-up ships. That is the only change
+   * needed — Card.astro switches element and hover behaviour off this field.
+   */
+  href?: string;
   visual: ImageMetadata;
   /** Empty alt = decorative (the compact card's app icon). */
   alt: string;
@@ -83,7 +97,6 @@ export const PROJECTS: Project[] = [
     blurb:
       'A plain-markdown knowledge base with an MCP server on top, so my AI tools and I read the same source of truth.',
     meta: 'markdown · MCP · 11 docs',
-    href: '#',
     visual: brain,
     alt: 'Diagram: AI tools read and write the brain, which I also read and write',
   },
@@ -94,7 +107,6 @@ export const PROJECTS: Project[] = [
     blurb:
       'A local-first pipeline pulling training, sleep and nutrition into one SQLite hub, reviewed weekly through MCP.',
     meta: 'SQLite · local-first',
-    href: '#',
     visual: fitness,
     alt: 'Bar chart: weekly training tonnage over twelve weeks',
   },
@@ -104,7 +116,6 @@ export const PROJECTS: Project[] = [
     title: 'QuietNine',
     blurb: 'A minimalist SwiftUI Sudoku, built end-to-end to learn the platform properly.',
     meta: 'SwiftUI',
-    href: '#',
     visual: quietnineIcon,
     alt: '',
   },
@@ -115,7 +126,6 @@ export const PROJECTS: Project[] = [
     blurb:
       'A two-box setup in the study: Proxmox, DNS, a reverse proxy, and Prometheus/Grafana watching the lot — learned from the BIOS up.',
     meta: 'Proxmox · Caddy · Grafana · 11 services',
-    href: '#',
     visual: homelab,
     alt: 'Diagram: services VM on Proxmox, node box, and off-site VPS',
   },
@@ -126,7 +136,9 @@ export const PROJECTS: Project[] = [
     blurb:
       'Astro on Cloudflare, zero JS, a design system shared with Wayfare. Built in the open; the rejected directions are in the repo.',
     meta: 'Astro · Cloudflare · zero JS',
-    href: '#',
+    /* The one card that has somewhere real to go: the repo it describes. Shared
+       with the footer and /about's receipts row via data/social.ts. */
+    href: REPO_URL,
     visual: thisSite,
     alt: 'Diagram: one shared design-system spine with two themes',
   },
