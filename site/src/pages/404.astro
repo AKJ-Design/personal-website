@@ -1,0 +1,80 @@
+---
+/**
+ * 404 — build plan step 9, closing the "404 copy" gate carried since 2026-08-28.
+ *
+ * No mock exists for this page, so it deliberately invents nothing: the eyebrow,
+ * the display h1 and the mono back-link are the type roles the post head and
+ * endplate already use, and it stays FLAT — hairlines on the ground, nothing
+ * floats (scope rule, decisions.md 2026-08-15). Cards float; this is not a card.
+ *
+ * Prerendered, like every route except `/`. Astro's router renders this for any
+ * path it cannot match, on the Worker, with a real 404 status — the thing that
+ * was wrong before was not the status but the page, which was Astro's own dark
+ * purple default sitting on the real domain.
+ *
+ * The offer to be told about a broken link is meant literally: the blog slugs
+ * are frozen (build plan §2.5), so an internal 404 is a genuine mistake worth
+ * hearing about rather than a decorative apology.
+ */
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Not found — Alex Young"
+  description="No page at this address."
+>
+  <section class="notfound">
+    <p class="eyebrow">404 · page not found</p>
+    <h1>Nothing lives here.</h1>
+    {/* The space before the link is explicit: Astro trims whitespace between a
+        text node and an element on the next line, which silently renders
+        "know —tell me". Same trap as the post meta line in blog/[id].astro. */}
+    <p class="lead">
+      You've found a URL I don't have a page for. Could be a typo, could be a
+      link I broke. If it was me, I'd rather know, so <a
+        href="mailto:hello@alexyoung.com.au">tell me</a> if a link on this site
+      sent you here.
+    </p>
+  </section>
+
+  <div class="endplate">
+    <a class="back" href="/">← back to the build log</a>
+    <span class="next">everything that exists is one click away</span>
+  </div>
+</Base>
+
+<style>
+  .notfound { padding: var(--space-8) 0 var(--space-7); }
+  .notfound h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-3);
+    line-height: var(--leading-head);
+    letter-spacing: var(--track-display);
+    margin-top: var(--space-3);
+  }
+  .notfound .lead {
+    margin-top: var(--space-5);
+    font-size: var(--step-1);
+    color: var(--muted);
+    max-width: var(--measure);
+  }
+
+  /* Same endplate as a post: hairline above, mono either side. */
+  .endplate {
+    border-top: 1px solid var(--hairline);
+    padding: var(--space-5) 0;
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: var(--space-4);
+  }
+  .endplate .back, .endplate .next {
+    font-family: var(--font-mono); font-size: var(--step--1);
+  }
+  .endplate .next { color: var(--muted-2); }
+
+  @media (max-width: 720px) {
+    .notfound { padding: var(--space-7) 0 var(--space-6); }
+    .notfound h1 { font-size: var(--step-2); }
+    .endplate { flex-direction: column; }
+  }
+</style>
