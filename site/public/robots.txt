@@ -1,23 +1,13 @@
-# ⚠️  PRE-LAUNCH: the whole site is closed to crawlers. FLIP THIS AT STEP 8/9.
+# Flipped 2026-09-02, build step 8 — the site is served from its real domain and
+# the workers.dev preview host is retired (`workers_dev: false` in wrangler.jsonc),
+# so this file can no longer be read from a second host carrying the same person.
 #
-# Why it is here rather than added at launch:
-#
-# The site is served from *.workers.dev before it is served from
-# alexyoung.com.au, and both hosts serve identical HTML. "Alex Young" is a
-# common name — design plan §8 makes entity consistency the entire SEO lever —
-# so a workers.dev URL competing with the real domain for the same person is
-# precisely the outcome to avoid. The canonical tag in Base.astro already points
-# every page at https://alexyoung.com.au, which is the proper fix; this file is
-# the belt to that braces while the only live host is a preview.
-#
-# AT STEP 8/9, replace everything below with:
-#
-#   User-agent: *
-#   Allow: /
-#   Sitemap: https://alexyoung.com.au/sitemap-index.xml
-#
-# and confirm from the outside that the preview host is either gone or still
-# disallowed — not just that the real domain is allowed.
+# That retirement is the reason this could be opened: before it, both hosts served
+# identical HTML including this file, and "Alex Young" is a common name — a
+# workers.dev URL competing with alexyoung.com.au for the same entity is precisely
+# what design plan §8's entity-consistency work exists to prevent.
 
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://alexyoung.com.au/sitemap-index.xml

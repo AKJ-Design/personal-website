@@ -33,6 +33,33 @@
 		}
 	],
 
+	// Step 8 — the real address. `custom_domain: true` makes Cloudflare own the whole
+	// chain on deploy: it creates the apex DNS record in the zone and issues the edge
+	// certificate, so there is nothing to hand-create and nothing to drift. A plain
+	// `routes` pattern would only match traffic that already reached the zone; this
+	// makes the hostname exist. Note what it does NOT touch: the MX/SPF/DKIM records
+	// that Email Routing manages sit beside it untouched — a custom domain is one
+	// A/AAAA-equivalent record at the apex, not a takeover of the zone.
+	//
+	// `www` is deliberately NOT a second custom domain here. Static assets are served
+	// by the ASSETS binding before any Astro code runs, so a redirect written in
+	// middleware would never fire for /about/ or /blog/. The www → apex redirect is a
+	// Cloudflare Redirect Rule at the edge instead, with a proxied placeholder record
+	// — see the repo README's step 8 notes.
+	"routes": [
+		{ "pattern": "alexyoung.com.au", "custom_domain": true }
+	],
+
+	// Both OFF, and stated rather than left to wrangler's default (which prints a
+	// warning on every deploy). The workers.dev host served identical HTML to the real
+	// domain, and once robots.txt allows crawling, a second host with the same person
+	// on it is exactly the common-name competition design plan §8 exists to prevent.
+	// Preview URLs are also workers.dev hosts, unguessable but still crawlable if ever
+	// linked; the same reasoning retires them. A branch push still uploads a version —
+	// it just has no public URL until promoted.
+	"workers_dev": false,
+	"preview_urls": false,
+
 	"observability": {
 		"enabled": true
 	}
