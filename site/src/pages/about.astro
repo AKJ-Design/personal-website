@@ -100,10 +100,11 @@ const personJsonLd = personLd(Astro.site!, new URL(ldPhoto.src, Astro.site).href
   </div>
 
   <section class="colophon-block">
-    <p>The site itself is one of the projects: Astro on Cloudflare, zero
-       JavaScript by default, and a design system shared with my iOS app that
-       will carry into whatever comes next. The rejected directions and the
-       mocks are committed alongside the code.</p>
+    <p>The site itself is one of the projects: Astro on Cloudflare, no
+       JavaScript of my own, and a design system shared with my iOS app that
+       will carry into whatever comes next. One script does load — Cloudflare's
+       analytics beacon, which I didn't write and which sets no cookies. The
+       rejected directions and the mocks are committed alongside the code.</p>
     <div class="receipts">
       <span class="k">receipts —</span>
       {RECEIPTS.map(({ href, label }) => <a href={href}>{label}</a>)}

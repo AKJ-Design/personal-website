@@ -18,10 +18,18 @@
  * `Article`; `BlogPosting` is its subtype and search engines treat the two the
  * same, so this stays as documented rather than quietly diverging.
  *
- * These blocks are the ONLY <script> tags the site emits. They carry data, not
- * code — there is still no client-side JavaScript anywhere (build plan's
- * zero-JS-by-default rule). If a script tag ever appears that is not one of
- * these, something has been added that the performance budget did not agree to.
+ * These blocks are the only <script> tags this REPO emits, and they carry data
+ * rather than code — no framework, no hydration, no islands.
+ *
+ * They are not the only scripts a BROWSER receives. Cloudflare Web Analytics
+ * injects a beacon at the edge, for browser requests only, so it appears in
+ * neither the build output nor a curl (found 2026-09-05, by a link checker that
+ * followed it). Check what visitors get with a browser user-agent, not curl:
+ *
+ *   curl -sA 'Mozilla/5.0' https://alexyoung.com.au/ | grep -o '<script[^>]*>'
+ *
+ * If a script appears there that is neither one of these blocks nor that
+ * beacon, something has been added the performance budget did not agree to.
  */
 import { GITHUB_URL, LINKEDIN_URL } from '../data/social';
 import { isoDate } from './posts';

@@ -15,10 +15,16 @@ import avatar1x from '../assets/alex-32.webp';
 import avatar2x from '../assets/alex-64.webp';
 
 /* Anchors are absolute, not bare fragments: the same header ships on /about and
-   /blog, where "#projects" would resolve to nothing. */
+   /blog, where "#projects" would resolve to nothing.
+
+   "writing" points at /blog/, not /#writing (2026-09-05). The index existed in
+   the sitemap from step 6 but NOTHING linked to it — a recursive link check
+   crawled the whole site and never reached it. With one post the two show much
+   the same thing; with five they will not, and a blog index a reader cannot
+   click to is a dead page that only a crawler ever sees. */
 const NAV = [
   { href: '/#projects', label: 'projects' },
-  { href: '/#writing', label: 'writing' },
+  { href: '/blog/', label: 'writing' },
   { href: '/about/', label: 'about' },
 ];
 

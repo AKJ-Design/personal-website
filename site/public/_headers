@@ -20,10 +20,12 @@
 #   coupling: turn HSTS off and nosniff goes with it, at which point it needs
 #   adding to this file and to the middleware.
 #
-#   Content-Security-Policy — deferred past launch. The only <script> tags are
-#   JSON-LD data blocks, but the replay figures and Astro's scoped styles would
-#   need a real audit before `style-src` could be strict, and a CSP that is
-#   'unsafe-inline' everywhere buys close to nothing.
+#   Content-Security-Policy — deferred past launch. The only scripts are the
+#   JSON-LD data blocks and Cloudflare's edge-injected analytics beacon (which a
+#   `script-src` would have to allowlist, or silently break), and the replay
+#   figures and Astro's scoped styles would need a real audit before `style-src`
+#   could be strict. A CSP that is 'unsafe-inline' everywhere buys close to
+#   nothing.
 #
 #   Cache-Control on /_astro/* — the Cloudflare adapter INJECTS that rule into
 #   this file during the build ("Injected immutable Cache-Control"). It skips the

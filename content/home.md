@@ -48,8 +48,8 @@ stamp that implies hours.*
 - **QuietNine** — a minimalist iOS/SwiftUI Sudoku game, built end-to-end to learn the platform properly.
 - **Homelab** — a two-box setup in the study: Proxmox, DNS, a reverse proxy, and
   Prometheus/Grafana watching the lot — learned from the BIOS up.
-- **This site** — Astro on Cloudflare, zero JS, a design system shared with Wayfare. Built in
-  the open; the rejected directions are in the repo.
+- **This site** — Astro on Cloudflare, no JavaScript of my own, a design system shared with
+  Wayfare. Built in the open; the rejected directions are in the repo.
 
 *Homelab rule: the public story is the services VM. The node box is just "another machine" —
 what it runs is never named or implied. Screenshots get a redaction pass against the private

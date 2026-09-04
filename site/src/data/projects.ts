@@ -134,8 +134,14 @@ export const PROJECTS: Project[] = [
     kind: 'mid',
     title: 'This site',
     blurb:
-      'Astro on Cloudflare, zero JS, a design system shared with Wayfare. Built in the open; the rejected directions are in the repo.',
-    meta: 'Astro · Cloudflare · zero JS',
+      'Astro on Cloudflare, no JavaScript of my own, a design system shared with Wayfare. Built in the open; the rejected directions are in the repo.',
+    /* "of my own" is load-bearing, not modesty (2026-09-05). Astro ships no
+       client-side JavaScript for this site — no framework, no hydration, no
+       islands — but Cloudflare Web Analytics injects a beacon at the EDGE, for
+       browser requests only. It is invisible to curl and absent from the build
+       output, which is why every check until now said zero. "zero JS" was
+       therefore a claim the front page could not keep. See /about's colophon. */
+    meta: 'Astro · Cloudflare · no JS of my own',
     /* The one card that has somewhere real to go: the repo it describes. Shared
        with the footer and /about's receipts row via data/social.ts. */
     href: REPO_URL,

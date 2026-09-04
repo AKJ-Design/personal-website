@@ -53,7 +53,8 @@ const articleJsonLd = articleLd({
   ogImage={`/og/${post.id}.png`}
   ogType="article"
 >
-  {/* Data, not code — the site still ships zero client-side JavaScript. */}
+  {/* Data, not code. Nothing this repo ships runs in the browser; the one
+      script that does is Cloudflare's edge-injected beacon — see lib/schema.ts. */}
   <script type="application/ld+json" is:inline set:html={JSON.stringify(articleJsonLd)} />
 
   <section class="post-head">
