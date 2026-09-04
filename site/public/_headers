@@ -1,0 +1,36 @@
+# Response headers for STATIC ASSETS — build plan step 9.
+#
+# THIS FILE COVERS ONLY WHAT THE ASSETS BINDING SERVES, which is every route
+# except `/`. The home page is the site's one non-prerendered route (step 7, so
+# the strip can read KV), and a Worker-generated response never passes through
+# this file — it is matched by src/middleware.ts instead. The two must be kept in
+# step; there is no shared source, because one is text and the other TypeScript.
+# `npm run build` will not catch a drift. The check that does is in ../README.md:
+# curl `/` and `/about/` and compare.
+#
+# Astro middleware cannot do this job on its own: for a PRERENDERED route the
+# middleware runs at BUILD time, so any header it sets is thrown away with the
+# build — static files on disk carry no headers.
+#
+# NOT SET HERE, deliberately:
+#
+#   X-Content-Type-Options: nosniff — already served zone-wide by Cloudflare's
+#   "No-Sniff Header" toggle, which lives INSIDE the HSTS panel (SSL/TLS → Edge
+#   Certificates). Setting it here too would emit the header twice. Note the
+#   coupling: turn HSTS off and nosniff goes with it, at which point it needs
+#   adding to this file and to the middleware.
+#
+#   Content-Security-Policy — deferred past launch. The only <script> tags are
+#   JSON-LD data blocks, but the replay figures and Astro's scoped styles would
+#   need a real audit before `style-src` could be strict, and a CSP that is
+#   'unsafe-inline' everywhere buys close to nothing.
+#
+#   Cache-Control on /_astro/* — the Cloudflare adapter INJECTS that rule into
+#   this file during the build ("Injected immutable Cache-Control"). It skips the
+#   injection if a matching rule already sets Cache-Control, so do not add one
+#   here or the hashed assets lose their immutable year.
+
+/*
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
