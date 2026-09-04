@@ -16,6 +16,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { publishedPosts, postMeta } from '../../lib/posts';
+import { articleLd } from '../../lib/schema';
 /* The Bangkok chat replay's generated timeline (see scripts/generate-replay.mjs)
    and the hand-authored delivered-then-opened figure that shares its stage */
 import '../../styles/replay.css';
@@ -29,6 +30,21 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const meta = postMeta(post);
+
+/* Article JSON-LD (build plan §2.5). The canonical URL is derived the same way
+   Base.astro derives <link rel="canonical">, so the two can only ever agree.
+   The author node carries the same `@id` as /about's Person — one entity across
+   both pages, which is design plan §8's lever. See lib/schema.ts. */
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const articleJsonLd = articleLd({
+  site: Astro.site!,
+  url: canonical,
+  title: post.data.title,
+  description: post.data.excerpt,
+  date: post.data.date,
+  imageUrl: new URL(`/og/${post.id}.png`, Astro.site).href,
+  tags: post.data.tags,
+});
 ---
 
 <Base
@@ -37,6 +53,9 @@ const meta = postMeta(post);
   ogImage={`/og/${post.id}.png`}
   ogType="article"
 >
+  {/* Data, not code — the site still ships zero client-side JavaScript. */}
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(articleJsonLd)} />
+
   <section class="post-head">
     <p class="post-eyebrow">{post.data.eyebrow}</p>
     <h1>{post.data.title}</h1>

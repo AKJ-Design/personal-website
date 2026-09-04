@@ -20,6 +20,7 @@ import photo from '../assets/alex-480.jpg';
 import { PROJECTS } from '../data/projects';
 import { publishedPosts } from '../lib/posts';
 import { GITHUB_URL, LINKEDIN_URL, REPO_URL } from '../data/social';
+import { personLd } from '../lib/schema';
 
 const postCount = (await publishedPosts()).length;
 const shipped = `${PROJECTS.length} projects · ${postCount} ${postCount === 1 ? 'post' : 'posts'}`;
@@ -33,29 +34,23 @@ const RECEIPTS = [
   { href: `${REPO_URL}/tree/main/design/mocks`, label: 'mocks' },
 ];
 
-/* Person JSON-LD, build-time (build plan §2.5): full name, photo, sameAs →
-   GitHub + LinkedIn only. The App Store joins if/when Wayfare leaves
-   TestFlight. Same constants as the footer, so the two cannot drift.
+/* Person JSON-LD, build-time (build plan §2.5). Built in lib/schema.ts, which
+   also builds the author node on every post — both at the SAME `@id`, so the
+   two pages assert one entity rather than two people who happen to share a
+   name. That is design plan §8's whole SEO lever; see the note in that file.
 
    The photo goes through getImage(), not photo.src: the compile-time image
    service only emits the optimized variants, so the original jpg's URL would
    404. getImage() emits a real asset and returns its built URL. */
 const ldPhoto = await getImage({ src: photo, width: 480, height: 480, format: 'jpeg' });
-const personLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Alex Young',
-  url: new URL('/about/', Astro.site).href,
-  image: new URL(ldPhoto.src, Astro.site).href,
-  sameAs: [GITHUB_URL, LINKEDIN_URL],
-};
+const personJsonLd = personLd(Astro.site!, new URL(ldPhoto.src, Astro.site).href);
 ---
 
 <Base
   title="About — Alex Young"
   description="Product strategy for airport and lounge experience by day. By night: a travel app on TestFlight, a knowledge base my AI tools read and write, and a home server running the lot — all designed, built and shipped by me."
 >
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(personLd)} />
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(personJsonLd)} />
 
   <section class="about-head">
     <p class="eyebrow">About · Brisbane, AU</p>
