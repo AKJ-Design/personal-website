@@ -7,6 +7,41 @@
 # workers.dev URL competing with alexyoung.com.au for the same entity is precisely
 # what design plan §8's entity-consistency work exists to prevent.
 
+# ---------------------------------------------------------------------------
+# THIS FILE IS NOT WHAT THE DOMAIN SERVES. Read that sentence twice before
+# debugging anything about crawling.
+#
+# Cloudflare's **managed robots.txt** is on for this zone, and it PREPENDS a
+# managed block above everything below. The served file is roughly six times
+# this length. Found 2026-09-05, during the step 8/9 review, by fetching the
+# live URL rather than reading this file — which is the only way to see it:
+#
+#   curl -s https://alexyoung.com.au/robots.txt
+#
+# What Cloudflare prepends:
+#   - a Content Signals preamble asserting rights under the EU copyright
+#     directive, plus `Content-Signal: search=yes,ai-train=no,use=reference`
+#   - `Disallow: /` for nine AI TRAINING crawlers — Amazonbot,
+#     Applebot-Extended, Bytespider, CCBot, ClaudeBot, Google-Extended, GPTBot,
+#     meta-externalagent, CloudflareBrowserRenderingCrawler
+#
+# What it deliberately does NOT touch, which is why it was kept (2026-09-05):
+# Googlebot, Bingbot and the AI *retrieval* bots are not named anywhere in the
+# served file, so search ranking is unaffected and an assistant running a live
+# web search can still reach the site. Google-Extended governs Gemini training
+# only — never Search. The thing given up is being absorbed as training data,
+# which is the trade design plan §8's long-tail strategy can afford.
+#
+# The switch: Cloudflare dashboard → Security → Settings, filter by Bot traffic
+# ("block training in robots.txt"); the legal preamble is a separate tick,
+# "Display Content Signals Policy", under Control AI Crawlers on the zone
+# overview. Turning either off changes the live file without changing this one.
+#
+# The served file therefore carries TWO `User-agent: *` groups — Cloudflare's
+# and the one below. RFC 9309 has compliant crawlers merge same-agent groups,
+# and both say `Allow: /`, so the outcome is identical. Untidy, not broken.
+# ---------------------------------------------------------------------------
+
 User-agent: *
 Allow: /
 

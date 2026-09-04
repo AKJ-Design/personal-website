@@ -7,10 +7,12 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://alexyoung.com.au',
 
-  /* Sitemap (build plan §2.5). URLs resolve against `site`, so it lists the
-     canonical domain even when built for the workers.dev preview. robots.txt
-     stays Disallow-all until step 8/9 — the sitemap exists, nothing links it
-     until then. */
+  /* Sitemap (build plan §2.5). URLs resolve against `site`, so every entry is
+     absolute against the canonical domain regardless of the host it was built
+     for — which is why nothing here had to change at step 8 when the
+     workers.dev preview was retired. robots.txt opened at step 8 (2026-09-02)
+     and names this sitemap; see the comment at the top of public/robots.txt
+     for what Cloudflare prepends to the file the domain actually serves. */
   integrations: [sitemap()],
 
   /* No code on this site's pages — the fenced blocks in posts are prompts,

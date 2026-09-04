@@ -99,8 +99,19 @@ Plan: `personal-plans/website-build-plan.md` (rev 1, accepted 2026-08-27). Code 
       file drop and cannot be automated, while the workout log arrives over an API and syncs
       unattended — so the row is now **Last workout · Services · Off-site backup · Weather**. The stamp was reworded — "live from my own APIs"
       stopped being true once weather (a public API) joined the row
-- [ ] **8 — Custom domain** (next): route the Worker to `alexyoung.com.au`, `www` redirect, HSTS,
-      and flip `robots.txt`
+- [x] **8 — Custom domain** (config 2026-09-02, finished 2026-09-05). The Worker is routed by
+      `custom_domain: true` in `wrangler.jsonc`, which makes Cloudflare own the whole chain on
+      deploy — it creates the apex record and issues the edge certificate, so there is nothing to
+      hand-create and nothing to drift. **`workers_dev` and `preview_urls` are both off**,
+      retiring a preview host that served identical HTML to the real domain. **`www` is a proxied
+      placeholder `AAAA` → `100::`** (RFC 6666's discard prefix; the proxy never connects to it)
+      **plus an edge Redirect Rule**, deliberately not a second custom domain: the ASSETS binding
+      answers static files before any Astro code runs, so a redirect written in middleware would
+      never fire for `/about/`. Then **Always Use HTTPS**, **HSTS** (12 months,
+      `includeSubDomains`, **preload off**) and **minimum TLS 1.2** — in that order, and the order
+      is the point (see the operating notes). `robots.txt` flipped to `Allow: /`
+- [ ] **9 — Launch check** (next): Lighthouse on every page, WCAG AA re-verified in the browser,
+      structured data validated, 404 page in voice, link check, runbook written
 
 Steps 5–7 ran as a Claude-driven stretch; 8–10 (custom domain, launch check, cross-post) are
 paired. Full sequence in the build plan §3.
@@ -128,7 +139,7 @@ settings below.
 | Root directory | `site` — **not optional**; the repo root has no `package.json` |
 | Build command | `npm run build` |
 | Deploy command | `npx wrangler deploy` |
-| Preview builds | enabled — non-`main` branches upload a *version*, nothing goes live |
+| Preview builds | enabled, but **`preview_urls: false` since step 8** — a non-`main` push uploads a *version* with **no public URL**. To look at one, promote it in the dashboard, or just run the production build locally |
 
 The Worker's dashboard name **must** equal `name` in `site/wrangler.jsonc` (`alexyoung-com-au`)
 or every build fails. Node needs no setting — Workers Builds defaults to 24.18.0 and
@@ -159,12 +170,15 @@ Found 2026-08-28 in the pre-step-3 review. Each names the step it must close by.
 - **GitHub + LinkedIn URLs — closed 2026-08-30 (step 5).** Both live in
   `site/src/data/social.ts`, imported by the footer and by /about's `Person` `sameAs` so the two
   can't drift: `github.com/AKJ-Design` · `linkedin.com/in/alexjyoung`.
-- **`robots.txt` — by step 8/9.** `site/public/robots.txt` currently disallows **everything**,
-  deliberately: the preview host and the real domain serve identical HTML, and a `workers.dev`
-  URL competing with `alexyoung.com.au` for a common name is what design plan §8's entity
-  consistency exists to prevent. The file says what to replace it with. **The site cannot be
-  indexed until this is flipped** — check the preview host from the outside too, not just the
-  real domain.
+- **`robots.txt` — closed 2026-09-02 (step 8), with a catch found 2026-09-05.** The file now
+  allows everything, which was only safe once `workers_dev: false` retired the second host. The
+  catch: **Cloudflare's managed robots.txt is on for this zone and prepends a block above the
+  repo's file**, so the served file is ~6× the length of `site/public/robots.txt` and blocks nine
+  AI *training* crawlers. Googlebot, Bingbot and the AI *retrieval* bots are untouched, so ranking
+  and assistant discovery are unaffected — kept for that reason. The full explanation, and the
+  dashboard switches, are in the comment at the top of `site/public/robots.txt`. **The rule to
+  remember: reading that file tells you nothing about what the domain serves.** Check it the only
+  way that is true — `curl -s https://alexyoung.com.au/robots.txt`.
 - **`fitness.db` sync — closed 2026-09-01 (step 7), by removing the dependency.** The pipeline
   was never fixed and the gate was closed a different way: the strip no longer publishes anything
   that needs it. The split that made this possible is worth keeping in mind — **the workout log
@@ -220,9 +234,10 @@ dig NS alexyoung.com.au +short && dig MX alexyoung.com.au @1.1.1.1 +short && dig
 
 ## Operating notes — the site
 
-- **Worker:** `alexyoung-com-au` · account `Alex.j.young@icloud.com` · workers.dev subdomain
-  `alex-j-young`. The name in `site/wrangler.jsonc` and the name in the dashboard must stay
-  equal, or Workers Builds fails every build.
+- **Worker:** `alexyoung-com-au` · account `Alex.j.young@icloud.com`. The name in
+  `site/wrangler.jsonc` and the name in the dashboard must stay equal, or Workers Builds fails
+  every build. The workers.dev subdomain was `alex-j-young`; since step 8 that host returns 404
+  and **the site has exactly one public address**, which is the entity-consistency point.
 - **Build and deploy by hand** (from `site/`):
 
 ```bash
@@ -238,7 +253,7 @@ npm run build && npx wrangler deploy
 npx wrangler deploy --dry-run
 ```
 
-  Until step 7 adds KV for the live strip, that should say **"No bindings found"**. If it ever
+  Since step 7 that should list **exactly two** bindings — `STRIP` (KV) and `ASSETS`. If it ever
   names `SESSION` or `IMAGES`, an adapter default has been re-enabled — see `site/README.md`.
 - **The dev server backgrounds itself.** Astro 7 returns immediately from `astro dev`; Ctrl-C
   does nothing. Use `npx astro dev status` / `logs` / `stop`.
@@ -267,6 +282,54 @@ npx wrangler deploy --dry-run
   a *new* token, not by re-picking from the dropdown, which still lists dead ones. A real build
   error takes 30 s+ and names a file. This is a fourth cause on top of the build plan §4 list of
   three (build error, missing binding, bad content frontmatter).
+### The domain, TLS and the two redirects (step 8)
+
+Written down because none of it lives in the repo — it is all zone configuration, and in six
+months the dashboard will look different.
+
+- **One public address, on purpose.** `alexyoung.com.au` is the only host that serves the site.
+  `workers_dev: false` and `preview_urls: false` in `wrangler.jsonc` retired the rest. A second
+  host serving identical HTML for a common name is the exact thing design plan §8 exists to
+  prevent, and it mattered the moment `robots.txt` opened.
+- **`www` is a redirect, not a site.** It is a *proxied* placeholder `AAAA` → `100::` (RFC 6666's
+  discard prefix) plus a Redirect Rule at Rules → Redirect Rules. Nothing ever connects to that
+  address: because the record is proxied, Cloudflare answers at the edge and the rule fires before
+  any origin connection is attempted. The record exists only so the hostname resolves at all.
+  **The rule matches `https://www.*` only** — plain HTTP on `www` is caught by Always Use HTTPS
+  first, which is why that setting is load-bearing rather than cosmetic.
+- **If you add the DNS record and see a `522`, that is correct.** It means the hostname resolves,
+  TLS terminated at Cloudflare, and nothing is yet telling the edge what to do — so it tried the
+  placeholder as an origin. The `522` disappears when the Redirect Rule saves. Cloudflare may also
+  warn *"this rule may not apply to your traffic"* while its own DNS check lags; **ignore and
+  deploy** rather than accepting its offer to create a second record.
+- **Order matters: Always Use HTTPS *before* HSTS.** HSTS tells a browser to refuse HTTP to this
+  host for a year and to refuse click-through on certificate errors. Sending that while HTTP still
+  answers `200` advertises a promise the server has not made. Enforce first, then advertise.
+- **HSTS is the one setting here that does not cleanly reverse.** `max-age=31536000` with
+  `includeSubDomains`; **preload is off and should stay off** — preload compiles into browser
+  binaries, takes months to leave, and reaches people who have never visited. Backing HSTS out
+  means setting `max-age` to 0 and waiting for every previous visitor to return. **Consequence to
+  remember: any future host under `alexyoung.com.au` must serve valid HTTPS from day one.** The
+  lab living on `akjdesign.uk` is what keeps that from ever biting.
+- **Verify from outside, and not with the system `curl`.** macOS ships LibreSSL and links `curl`
+  against it, and it *silently ignores* TLS version pinning — it will report TLS 1.0 as accepted
+  when the server refused it. Cost twenty minutes on 2026-09-05. Use the Homebrew OpenSSL:
+
+```bash
+/opt/homebrew/opt/openssl@3/bin/openssl s_client -connect alexyoung.com.au:443 -servername alexyoung.com.au -tls1_1 2>&1 | grep -c 'Cipher is'
+```
+
+  `0` means refused, which is the wanted answer for `-tls1` and `-tls1_1`. Minimum is TLS 1.2.
+
+- **Testing a DNS record you just created**, before your resolver catches up — pin it and skip DNS:
+
+```bash
+curl -sI --resolve www.alexyoung.com.au:443:104.21.87.205 https://www.alexyoung.com.au/about/
+```
+
+  Querying a name *before* it exists caches the NXDOMAIN locally for the zone's negative TTL
+  (SOA minimum, 1800 s here), which looks exactly like the record having failed.
+
 ### The live strip — operating it
 
 The values are **pushed**, never pulled: `home-lab/scripts/strip-snapshot.sh` runs hourly under
