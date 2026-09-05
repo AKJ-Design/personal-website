@@ -35,6 +35,7 @@ src/assets/               images. The /about photo is optimised at build; everyt
                           renders is PRE-SIZED (see §4)
 public/images/            post screenshots and diagrams, served as-is (pre-sized by hand)
 public/og/                GENERATED at build by scripts/generate-og.mjs — gitignored
+scripts/generate-crosspost.mjs   post -> dev.to-ready Markdown (step 10); output gitignored
 ```
 
 ## Three things that are not obvious

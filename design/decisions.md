@@ -117,6 +117,13 @@ records what Alex has actually settled.*
 - **Ground and ink locked with it:** `#FAF7F2` warm off-white, `#141210` ink (17.49:1). Stone greys
   `#57514A` (7.33:1, secondary prose) and `#8A8177` (3.58:1, **labels and hairlines only — never
   body copy**).
+  - ⚠️ **`#8A8177` was superseded — see `tokens.css`, which is the live value and carries the
+    reasoning.** Left in place here because this is a dated log of what was decided on the day,
+    not a palette reference. The short version: 3.58:1 is fine for a hairline but **fails AA for
+    the 11px uppercase labels the token exists to colour**, and "labels and hairlines only" did not
+    save it, because labels are text. `--muted-2` is now `#6B6358` at 5.53:1. Re-verified by
+    computation at build step 9 (2026-09-05), along with all eleven pairs — every one passes,
+    worst 5.20:1. **Read the current palette from `tokens.css`, never from this file.**
 - **Design-system architecture: shared spine, two themes.** One token vocabulary and one set of
   structural rules, with **Field Notes Light** (this site) and **Wayfare Dark** (the iOS app) as
   themes over it. The two surfaces stay deliberately different; what they share is structure —

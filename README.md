@@ -276,9 +276,9 @@ Written down now because these are the parts that bite when debugging alone mont
 dig NS alexyoung.com.au +short && dig MX alexyoung.com.au @1.1.1.1 +short && dig TXT _dmarc.alexyoung.com.au @1.1.1.1 +short
 ```
 
-## Runbook — the five things to be able to do unaided
+## Runbook — the things to be able to do unaided
 
-Build plan §4's exit test, in its order. Each answer is short on purpose; the
+Build plan §4's exit test, in its order, plus the cross-post step 10 adds. Each answer is short on purpose; the
 detail sits in the operating notes below, and this list is the index into them.
 
 **1 · Write a post and see it live.** One Markdown file in
@@ -321,7 +321,28 @@ silently.** Verify from outside, not the dashboard:
 dig NS alexyoung.com.au +short && dig MX alexyoung.com.au @1.1.1.1 +short && dig TXT _dmarc.alexyoung.com.au @1.1.1.1 +short
 ```
 
-**5 · Rotate the snapshot token.** New token at Cloudflare → Manage API tokens
+**5 · Cross-post a piece without competing with yourself.** From `site/`:
+
+```bash
+node scripts/generate-crosspost.mjs wayfare-part-1
+```
+
+Writes `dist/crosspost/<slug>.md` (gitignored) and **posts nothing**. It fixes the four things
+that break on the way out: `canonical_url` (the whole point — without it the copy competes with
+the original, which for a common name is exactly what design plan §8 exists to prevent),
+site-relative image URLs, the **CSS-only replay figures** (~30 divs each whose meaning lives
+entirely in `styles/replay.css`; dev.to ships no stylesheet, so they would render as a wall of
+loose sentences — replaced by a line of prose and a link back), and the `<figure>` wrappers, whose
+classes dev.to strips. It **exits non-zero** if any site-only markup survives, so a bad transform
+cannot be pasted by accident. Paste into dev.to, keep `published: false`, and **check the code
+fence inside the `<details>` block in their preview** — Markdown inside raw HTML is the one thing
+their parser is inconsistent about. Then verify the canonical from outside:
+
+```bash
+curl -s <the dev.to URL> | grep -i 'rel="canonical"'
+```
+
+**6 · Rotate the snapshot token.** New token at Cloudflare → Manage API tokens
 with the single permission *Workers KV Storage: Edit*, then:
 
 ```bash
