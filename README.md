@@ -339,8 +339,14 @@ fence inside the `<details>` block in their preview** — Markdown inside raw HT
 their parser is inconsistent about. Then verify the canonical from outside:
 
 ```bash
-curl -s <the dev.to URL> | grep -i 'rel="canonical"'
+curl -s "https://dev.to/USERNAME/SLUG" | grep -i 'rel="canonical"'
 ```
+
+It must print a canonical pointing at `alexyoung.com.au`. If it prints nothing, dev.to did not
+take the frontmatter and the cross-post is competing with the original — fix it before it is
+indexed. (Placeholders in this README are always `LIKE_THIS`, never `<like this>`: **`<` and `>`
+are redirection operators**, so a copied command containing them dies with a zsh parse error
+before it runs.)
 
 **6 · Rotate the snapshot token.** New token at Cloudflare → Manage API tokens
 with the single permission *Workers KV Storage: Edit*, then:
