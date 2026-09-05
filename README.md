@@ -110,8 +110,20 @@ Plan: `personal-plans/website-build-plan.md` (rev 1, accepted 2026-08-27). Code 
       never fire for `/about/`. Then **Always Use HTTPS**, **HSTS** (12 months,
       `includeSubDomains`, **preload off**) and **minimum TLS 1.2** — in that order, and the order
       is the point (see the operating notes). `robots.txt` flipped to `Allow: /`
-- [ ] **9 — Launch check** (next): Lighthouse on every page, WCAG AA re-verified in the browser,
-      structured data validated, 404 page in voice, link check, runbook written
+- [~] **9 — Launch check** (2026-09-05, all but the Lighthouse numbers). **404** page in Alex's
+      voice, replacing Astro's purple default. **`Article` JSON-LD** on posts sharing ONE `@id`
+      with /about's `Person` — both validate at schema.org with **0 errors, 0 warnings**, and the
+      author reference resolves rather than dangling. **Security headers** in two layers
+      (`public/_headers` + `src/middleware.ts`; neither can cover the other's routes — see
+      `site/README.md`). **Cards** that pointed at `#` are no longer links. **`/blog/` un-orphaned**
+      — it was in the sitemap and linked from nowhere; the nav now points at it. **WCAG AA
+      re-verified** by computing all 11 token pairs: every one passes, worst is 5.20:1.
+      ⚠️ *Note `design/decisions.md` is stale on this — it records the lightest grey as `#8A8177`
+      at 3.58:1, which would fail; the shipped token is `#6B6358` at 5.53:1.* **Link check** clean
+      across 36 links. **Runbook** written below. **Outstanding: Lighthouse mobile scores** — the
+      plan's ≥95 bar, not yet measured (PageSpeed's keyless API quota was exhausted). Measured
+      around it instead: 21 ms TTFB, 83 KB, 7 resources
+- [ ] **10 — Cross-post** Wayfare Part 1 to dev.to with `rel=canonical` back here
 
 Steps 5–7 ran as a Claude-driven stretch; 8–10 (custom domain, launch check, cross-post) are
 paired. Full sequence in the build plan §3.
