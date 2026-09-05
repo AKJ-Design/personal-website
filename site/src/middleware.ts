@@ -35,6 +35,24 @@ const SECURITY_HEADERS: Record<string, string> = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
 };
 
+/**
+ * `/` was sending NO Cache-Control at all (found 2026-09-05, while adding cache
+ * rules to _headers). A response with no freshness information invites heuristic
+ * caching, and this is the one route on the site that must never be served stale:
+ * it exists solely so four values can be current.
+ *
+ * The failure that makes this worth a header rather than a shrug is specific. The
+ * strip's stamp is rendered at REQUEST time and compares the snapshot's date to
+ * today's, so it can say "cached yesterday 15:33" instead of "cached 15:33" — the
+ * fix in commit fdcff79. A page held in a browser cache across midnight renders
+ * that comparison with the wrong "today" and quietly reintroduces the same bug,
+ * with no server involved and nothing to see in a log.
+ *
+ * Same value the static pages already carry, so the whole site is consistent:
+ * revalidate every time, and a 304 still costs only a round trip.
+ */
+const NO_STALE = 'public, max-age=0, must-revalidate';
+
 export const onRequest = defineMiddleware(async (_context, next) => {
   const response = await next();
 
@@ -45,6 +63,12 @@ export const onRequest = defineMiddleware(async (_context, next) => {
   try {
     for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
       response.headers.set(name, value);
+    }
+    /* Only for a response this middleware actually reaches at request time, and
+       only if nothing upstream has already decided — static assets get their
+       Cache-Control from _headers and must not be overridden here. */
+    if (!response.headers.has('Cache-Control')) {
+      response.headers.set('Cache-Control', NO_STALE);
     }
   } catch (err) {
     console.error('middleware: could not set security headers', err);

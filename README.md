@@ -120,9 +120,22 @@ Plan: `personal-plans/website-build-plan.md` (rev 1, accepted 2026-08-27). Code 
       re-verified** by computing all 11 token pairs: every one passes, worst is 5.20:1.
       ⚠️ *Note `design/decisions.md` is stale on this — it records the lightest grey as `#8A8177`
       at 3.58:1, which would fail; the shipped token is `#6B6358` at 5.53:1.* **Link check** clean
-      across 36 links. **Runbook** written below. **Outstanding: Lighthouse mobile scores** — the
-      plan's ≥95 bar, not yet measured (PageSpeed's keyless API quota was exhausted). Measured
-      around it instead: 21 ms TTFB, 83 KB, 7 resources
+      across 36 links. **Runbook** written below. **Lighthouse (mobile, PageSpeed Insights,
+      2026-09-05)** — the plan's ≥95 bar met on both pages measured:
+
+      | URL | Perf | A11y | Best practices | SEO | LCP | TBT | CLS |
+      |---|---|---|---|---|---|---|---|
+      | `/` | 99 | 100 | 100 | 100 | 1.6 s | 0 ms | 0 |
+      | `/about/` | 99 | 100 | 100 | 100 | 1.6 s | 0 ms | 0 |
+      | `/blog/` | — | — | — | — | — | — | — |
+      | `/blog/wayfare-part-1/` | — | — | — | — | — | — | — |
+
+      **The two blank rows are the point, not an omission.** `/blog/wayfare-part-1/` is the
+      heaviest page on the site and the only one carrying `public/images/` files, which is exactly
+      what the "efficient cache lifetimes" diagnostic is about — see below. Measure it before
+      believing the table generalises. Both 99s lose their point to *legacy JavaScript*, which is
+      Cloudflare's analytics beacon: the only script on the site, and the only performance debt,
+      is the one thing here that Alex did not write
 - [ ] **10 — Cross-post** Wayfare Part 1 to dev.to with `rel=canonical` back here
 
 Steps 5–7 ran as a Claude-driven stretch; 8–10 (custom domain, launch check, cross-post) are

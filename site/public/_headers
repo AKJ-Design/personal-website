@@ -36,3 +36,31 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+# Cache for files served straight out of public/ — added 2026-09-05 after
+# PageSpeed's "use efficient cache lifetimes" diagnostic, which was correct.
+#
+# Everything under /_astro/ is content-hashed by the build, so it gets a year and
+# `immutable` (injected above). Files in public/ keep their LITERAL names, so a
+# long cache is a promise you cannot take back: replace an image and returning
+# visitors keep the old one until it expires, with no way to purge their browsers.
+#
+# Seven days is the deliberate middle. The post page alone carries 674 KB of
+# these — eight times the whole home page — and before this they revalidated on
+# EVERY visit, a network round trip per image on a phone. A week of caching takes
+# that away while keeping the recovery window short, which matters here for one
+# specific reason: the failure mode this site actually worries about is a
+# redaction miss in a published screenshot, and that is precisely the case where
+# "it will clear in a year" is the wrong answer.
+#
+# If an image must change sooner than its cache expires, RENAME IT. The URL is
+# the cache key. Same discipline as the frozen post slugs, opposite direction.
+
+/images/*
+  Cache-Control: public, max-age=604800
+
+/og/*
+  Cache-Control: public, max-age=604800
+
+/favicon.svg
+  Cache-Control: public, max-age=604800

@@ -131,6 +131,33 @@ build-time check. **A drift between them is silent.** The check:
 for u in / /about/; do curl -sI "https://alexyoung.com.au$u" | grep -iE 'referrer|frame|permissions'; done
 ```
 
+### Four cache tiers, and why they differ
+
+| Path | Cache-Control | Why |
+|---|---|---|
+| `/_astro/*` | 1 year, `immutable` | content-hashed by the build, so the name changes when the bytes do |
+| `/images/*`, `/og/*`, `/favicon.svg` | 7 days | literal filenames — a long cache is a promise you cannot take back |
+| everything else static (HTML) | `max-age=0, must-revalidate` | pages must reflect the latest deploy |
+| `/` | `max-age=0, must-revalidate`, set by the middleware | it exists to be current |
+
+The seven days is a deliberate middle, added 2026-09-05 after PageSpeed's
+"efficient cache lifetimes" diagnostic, which was right: the post page alone
+carries **674 KB** of `public/` images — eight times the whole home page — and
+they were revalidating on every visit, a round trip each on a phone. A year would
+be faster still, but `public/` filenames are literal, so replacing an image
+leaves returning visitors on the old one with no way to purge their browsers.
+The failure this site actually worries about is a redaction miss in a published
+screenshot, and that is exactly when "it clears in a year" is the wrong answer.
+**If an image must change sooner than its cache expires, rename it** — the URL is
+the cache key.
+
+`/` had no `Cache-Control` at all until the same pass. That matters more than it
+looks: the strip's stamp is rendered at request time and compares the snapshot's
+date against today's so it can say "cached yesterday 15:33". A page held in a
+browser cache across midnight makes that comparison with the wrong "today" and
+silently reintroduces the bug commit `fdcff79` fixed — with no server involved
+and nothing in any log.
+
 `X-Content-Type-Options: nosniff` is in neither, on purpose — Cloudflare serves
 it zone-wide from the **No-Sniff toggle inside the HSTS panel**. Turn HSTS off
 and nosniff goes with it, at which point it needs adding to both files.
