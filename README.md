@@ -110,7 +110,7 @@ Plan: `personal-plans/website-build-plan.md` (rev 1, accepted 2026-08-27). Code 
       never fire for `/about/`. Then **Always Use HTTPS**, **HSTS** (12 months,
       `includeSubDomains`, **preload off**) and **minimum TLS 1.2** — in that order, and the order
       is the point (see the operating notes). `robots.txt` flipped to `Allow: /`
-- [~] **9 — Launch check** (2026-09-05, all but the Lighthouse numbers). **404** page in Alex's
+- [x] **9 — Launch check** (2026-09-05). **404** page in Alex's
       voice, replacing Astro's purple default. **`Article` JSON-LD** on posts sharing ONE `@id`
       with /about's `Person` — both validate at schema.org with **0 errors, 0 warnings**, and the
       author reference resolves rather than dangling. **Security headers** in two layers
@@ -123,19 +123,26 @@ Plan: `personal-plans/website-build-plan.md` (rev 1, accepted 2026-08-27). Code 
       across 36 links. **Runbook** written below. **Lighthouse (mobile, PageSpeed Insights,
       2026-09-05)** — the plan's ≥95 bar met on both pages measured:
 
-      | URL | Perf | A11y | Best practices | SEO | LCP | TBT | CLS |
-      |---|---|---|---|---|---|---|---|
-      | `/` | 99 | 100 | 100 | 100 | 1.6 s | 0 ms | 0 |
-      | `/about/` | 99 | 100 | 100 | 100 | 1.6 s | 0 ms | 0 |
-      | `/blog/` | — | — | — | — | — | — | — |
-      | `/blog/wayfare-part-1/` | — | — | — | — | — | — | — |
+      | URL | Perf | A11y | Best practices | SEO | FCP | LCP | TBT | CLS |
+      |---|---|---|---|---|---|---|---|---|
+      | `/` | 99 | 100 | 100 | 100 | 1.5 s | 1.8 s | 0 ms | 0 |
+      | `/about/` | 99 | 100 | 100 | 100 | 1.5 s | 1.6 s | 0 ms | 0 |
+      | `/blog/wayfare-part-1/` | 99 | 100 | 100 | 100 | 1.5 s | 1.6 s | 0 ms | 0 |
+      | `/blog/` | not measured | | | | | | | |
 
-      **The two blank rows are the point, not an omission.** `/blog/wayfare-part-1/` is the
-      heaviest page on the site and the only one carrying `public/images/` files, which is exactly
-      what the "efficient cache lifetimes" diagnostic is about — see below. Measure it before
-      believing the table generalises. Both 99s lose their point to *legacy JavaScript*, which is
-      Cloudflare's analytics beacon: the only script on the site, and the only performance debt,
-      is the one thing here that Alex did not write
+      Moto G Power, Slow 4G throttling, Lighthouse 13.4.1. Re-run after the cache fix below, and
+      it shows: `/about/`'s cache diagnostic fell **30 KiB → 4 KiB**, and the post — 674 KB of
+      `public/` images — reports **33 KiB**, not the several hundred it would uncached. Home's LCP
+      moved 1.6 → 1.8 s between two runs of identical code, which is ordinary throttled-Lighthouse
+      variance and a reason not to chase a single number.
+
+      **`/blog/` was not measured**, so the plan's "every page" is met three-quarters literally.
+      It is the lowest-risk omission on the site — one post card, no `public/` images, structurally
+      a subset of home's Writing section — but it is unmeasured, not "fine".
+
+      **All three lose their single point to the same thing: *legacy JavaScript*, 11 KiB,
+      identical on every page.** That is Cloudflare's analytics beacon. The only script on this
+      site, and its only measurable performance debt, is the one thing on it Alex did not write
 - [ ] **10 — Cross-post** Wayfare Part 1 to dev.to with `rel=canonical` back here
 
 Steps 5–7 ran as a Claude-driven stretch; 8–10 (custom domain, launch check, cross-post) are
