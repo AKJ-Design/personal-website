@@ -166,7 +166,19 @@ Found 2026-08-28 in the pre-step-3 review. Each names the step it must close by.
   (gitignored) as static assets.
 - **`/blog/` index — closed 2026-08-30 (step 6).** Derived from the home Writing section as
   decided; no separate mock.
-- **404 copy — by step 9** not written.
+- **404 copy — closed 2026-09-05 (step 9).** `site/src/pages/404.astro`, in Alex's voice
+  ("Nothing lives here."), replacing Astro's default dark-purple page which had been serving on
+  the real domain. No mock existed, so it reuses the post head's and endplate's type roles and
+  stays flat. Its offer to be told about a broken link is meant literally — the slugs are frozen,
+  so an internal 404 is a real mistake.
+- **Cloudflare edits the response — found 2026-09-05, and now a standing check.** Two zone
+  features change what a visitor receives without appearing anywhere in this repo: the **managed
+  `robots.txt`** prepend (see `site/public/robots.txt`) and **Web Analytics injecting a JS
+  beacon**, which is why the front page's "zero JS" claim had to become "no JavaScript of my own".
+  The beacon is injected only for browser-like requests, so `curl` and the build output both
+  reported zero scripts, correctly and misleadingly. Neither is a bug and both were kept; what was
+  wrong was the repo asserting otherwise. **The check is in the runbook** — run it before trusting
+  any claim on this site that begins "no" or "zero".
 - **GitHub + LinkedIn URLs — closed 2026-08-30 (step 5).** Both live in
   `site/src/data/social.ts`, imported by the footer and by /about's `Person` `sameAs` so the two
   can't drift: `github.com/AKJ-Design` · `linkedin.com/in/alexjyoung`.
@@ -231,6 +243,85 @@ Written down now because these are the parts that bite when debugging alone mont
 ```bash
 dig NS alexyoung.com.au +short && dig MX alexyoung.com.au @1.1.1.1 +short && dig TXT _dmarc.alexyoung.com.au @1.1.1.1 +short
 ```
+
+## Runbook — the five things to be able to do unaided
+
+Build plan §4's exit test, in its order. Each answer is short on purpose; the
+detail sits in the operating notes below, and this list is the index into them.
+
+**1 · Write a post and see it live.** One Markdown file in
+`site/src/content/blog/`. Frontmatter: `title`, `date`, `eyebrow`, `excerpt`,
+`tags`, optional `next`. **The filename is the slug and slugs are frozen** —
+`/blog/<name>/` must never change once published. Push to `main`. The build
+generates the OG card, the RSS entry, the sitemap row and both index cards;
+counts and reading time are computed, never typed. Images go in
+`site/public/images/<post>/`, pre-sized by hand, referenced from raw-HTML
+`<figure class="shot">` blocks — and anything personal gets its redaction pass
+*before* the file enters the repo.
+
+**2 · Why `/` is the only server-rendered route, and what stale looks like.**
+Because the live strip reads its snapshot from KV per request, and only that.
+`site/src/pages/index.astro` sets `export const prerender = false`; every other
+route is a static file served by the ASSETS binding. Degrade, in three steps:
+under 24 h the values with a `cached HH:MM` stamp and a pulsing green dot; over
+24 h the same values, a stamp saying how many days, and an amber dot that stops
+pulsing; no snapshot at all renders **em dashes and "snapshot unavailable"** —
+never the mock's numbers, because inventing a service count while the pipeline
+is down is exactly the untrue claim `design/decisions.md` forbids. The page is
+its own monitor: a laptop asleep or off the network says so on the front page.
+
+**3 · Triage a failed build — read the clock first.** Under ~3 seconds, during
+*"Initializing build environment"*: it died before your code was fetched, so it
+is environment or auth — most likely a **stale Cloudflare build token**, fixed by
+creating a *new* token in Settings → Builds, not by re-picking from the dropdown,
+which still lists dead ones. 30 s or more and naming a file: a real build error.
+The other two usual causes are a missing binding and bad content frontmatter.
+
+**4 · Add a DNS record without breaking mail.** Add it in the zone as normal, and
+**do not touch anything Email Routing manages** — the MX and DKIM records show as
+*Locked* and are maintained for you; if routing breaks, check they still exist
+before anything else. The apex TXT is left *Unlocked* on purpose: sending as
+`hello@` later means **adding an include to the existing SPF record**, never
+creating a second one. **Two SPF records is a permanent error that fails mail
+silently.** Verify from outside, not the dashboard:
+
+```bash
+dig NS alexyoung.com.au +short && dig MX alexyoung.com.au @1.1.1.1 +short && dig TXT _dmarc.alexyoung.com.au @1.1.1.1 +short
+```
+
+**5 · Rotate the snapshot token.** New token at Cloudflare → Manage API tokens
+with the single permission *Workers KV Storage: Edit*, then:
+
+```bash
+security add-generic-password -U -s strip-snapshot-cf-token -a alex -w
+```
+
+then `launchctl kickstart -p gui/$UID/com.akjdesign.strip-snapshot` and read the
+log. **Nothing needs redeploying** — the Worker only ever reads.
+
+### The check that neither the repo nor a build will do for you
+
+Added 2026-09-05, after two separate Cloudflare features turned out to be
+changing what visitors receive while this repo said otherwise: **the managed
+`robots.txt` prepend**, and **Web Analytics injecting a JavaScript beacon**. Both
+are invisible to `npm run build`, invisible in `dist/`, and the beacon is
+invisible to `curl` as well, because it is only injected for browser-like
+requests. Nothing in this repo can detect either.
+
+So the site's own claims have to be checked against the live domain, with a
+browser's user agent, and not against the build:
+
+```bash
+curl -sA 'Mozilla/5.0' https://alexyoung.com.au/ | grep -o '<script[^>]*>'
+```
+
+```bash
+curl -s https://alexyoung.com.au/robots.txt
+```
+
+Run both before believing any sentence on this site that begins "no" or "zero".
+The general rule this is an instance of: **an edge platform is allowed to edit
+your response, so the repo is evidence of intent, not of what shipped.**
 
 ## Operating notes — the site
 
